@@ -1,21 +1,10 @@
-## React Countdown Timer
+## React Programmable Table based on fixed-data-table
 
 ### Running the application
 
-```sh
-$ npm install
-$ webpack
-$ npm start
-```
 
 ### Running tests
-
-```sh
-$ npm test
-```
+ 
 
 ### Coverage Reporting
 
-```sh
-$ npm test -- --coverage
-```
