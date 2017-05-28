@@ -128,6 +128,9 @@ class SuperTable extends React.Component {
 
   /**
    * Will mount = DOM ready.  We can use ReactDOM to find our elements via refs.
+   * 
+   * IF this table is in percentages.. then adjust based on owning div size (found via ref)
+   * 
    */
   componentDidMount() {
     console.log( '**********************************');
