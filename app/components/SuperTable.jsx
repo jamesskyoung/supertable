@@ -124,7 +124,8 @@ class SuperTable extends React.Component {
       colSortDirs: {},
       displayMode: 'none',
       tableWidth: 0,
-      columnWidths: {}
+      columnWidths: {},
+      caller: this.props.self
     };
 
     this._onSortChange = this._onSortChange.bind(this);
@@ -140,6 +141,7 @@ class SuperTable extends React.Component {
    * 
    */
   componentDidMount() {
+    //return;
     console.log('**********************************');
     if (_.isNumber(this.props.tableWidth)) {
       console.log('Table width is numeric.. just return.');
@@ -166,7 +168,7 @@ class SuperTable extends React.Component {
         console.log('percentage is: ' + percent);
         let newWidth = tableWidthPixels * (percent / 100);
         console.log('Table width: ' + tableWidthPixels + ' Percentage: ' + colObj.percentage + ' new width: ' + newWidth);
-        colObj.width = newWidth;
+        colObj.width = Math.round( newWidth );
       }
     });
 
@@ -252,7 +254,7 @@ class SuperTable extends React.Component {
         colObj.width = 100;
       }
       columnWidths[colObj.attribute] = colObj.width;
-      console.log('xxxx ' + columnWidths[colObj.header]);
+      console.log('xxxx ' + columnWidths[colObj.attribute]);
       tableWidth += colObj.width;
       console.log(colObj.header + '___' + colObj.width);
       //tableWidth += colObj.width;
@@ -317,6 +319,13 @@ class SuperTable extends React.Component {
     });
   }
 
+  _onRowClick( event, index ) {
+    console.log( 'here is the event:',event,
+               'the index:',index );
+    alert( this.props.onRowClickCallback );
+    let row = this.state.sortedDataList.getObjectAt( index );
+    this.props.onRowClickCallback( row );
+  }
 
   render() {
     if (this.state.dataAttrNames.length === 0 || this.state.tableWidth === 0) {
@@ -343,6 +352,7 @@ class SuperTable extends React.Component {
           height={this.props.height ? this.props.height : 500}
           isColumnResizing={false}
           onColumnResizeEndCallback={this._onColumnResizeEndCallback}
+          onRowClick={this._onRowClick.bind(this)}
           {...this.props}>
 
           {this._columnMeta.map((col, index) => {
