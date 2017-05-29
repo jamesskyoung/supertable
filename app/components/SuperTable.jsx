@@ -9,11 +9,14 @@
 
 /*
  * TODO:
+ * Paging.. only show rows x-y.   
+ * Lazy loading.  Might only have 'x' rows... need api to update data array and repaint etc.. but also include paging info
+ * Custom callbacks on:
+ * APIs for 
+ * Row clicked, cell clicked.. 
+ * Get row object.. get cell object (row object is a collection of cell objects)
+ * Set cell renderer
  * 
- * If tablewidth is %, then make table the width f the parent div... 
- * In this case, all columns must use a % as their width.  
- * 
- * q/ CHanging dom elements at runtime via ReactDom?
  */
 //fixedDataTableLayout_main public_fixedDataTable_main
 //box-shadow: 1px 2px 30px #888888;
@@ -96,6 +99,8 @@ class DataListWrapper {
 
 /**
  * Table... James Young
+ * 
+ * 
  */
 class SuperTable extends React.Component {
 
