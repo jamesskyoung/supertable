@@ -37,8 +37,14 @@ function getColumnMetaData() {
     ]
 
 }
+
 function rowClick( row ) {
     alert( 'Row clicked! Id is: ' + row.id )
+}
+
+
+function cellClick( column, data ) {
+    alert( 'Cell clicked! attribute name : ' + column + ' Id is: ' + data['id'] );
 }
 
 ReactDOM.render(
@@ -48,6 +54,7 @@ ReactDOM.render(
             tableWidth={'100%'}
             data={data}
             columnMeta={ getColumnMetaData() }
+            onCellClickCallback={cellClick}
             onRowClickCallback={rowClick}
             
         />

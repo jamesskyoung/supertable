@@ -72,12 +72,35 @@ class SortHeaderCell extends React.Component {
   }
 }
 
-const TextCell = ({ rowIndex, data, columnKey, ...props }) => (
-  <Cell {...props}>
+const xTextCell = ({ rowIndex, data, columnKey, ...props }) => (
+  <Cell {...props} >
     {data.getObjectAt(rowIndex)[columnKey]}
 
   </Cell>
 );
+
+//Button Component
+class TextCell extends React.Component {
+  constructor(props) {
+    super(props);
+    this._name = this.props.name;
+    this._cellData = this.props.data.getObjectAt(this.props.rowIndex)[this.props.columnKey];
+    this._data = this.props.data.getObjectAt(this.props.rowIndex);
+  }
+
+  clickEventHandler(e) {
+    this.props.onClick(e, this._name, this._data);
+  }
+
+  render() {
+    let props = this.props;
+    return (
+      <Cell {...props} onClick={this.clickEventHandler.bind(this)}>
+        {this._cellData}
+      </Cell>
+    )
+  }
+}
 
 class DataListWrapper {
   constructor(indexMap, data) {
@@ -149,6 +172,8 @@ class SuperTable extends React.Component {
     }
     let tableWidth = parseInt(this.props.tableWidth.replace('%', ''));
     console.log('twipercentixels: ' + tableWidth)
+    alert(ReactDOM.findDOMNode(this.refs.id));
+
     let table = ReactDOM.findDOMNode(this.refs.superTable);
     let rect = table.getBoundingClientRect();
     let tableWidthPixels = rect.width * (tableWidth / 100);
@@ -168,7 +193,7 @@ class SuperTable extends React.Component {
         console.log('percentage is: ' + percent);
         let newWidth = tableWidthPixels * (percent / 100);
         console.log('Table width: ' + tableWidthPixels + ' Percentage: ' + colObj.percentage + ' new width: ' + newWidth);
-        colObj.width = Math.round( newWidth );
+        colObj.width = Math.round(newWidth);
       }
     });
 
@@ -319,12 +344,18 @@ class SuperTable extends React.Component {
     });
   }
 
-  _onRowClick( event, index ) {
-    console.log( 'here is the event:',event,
-               'the index:',index );
-    alert( this.props.onRowClickCallback );
-    let row = this.state.sortedDataList.getObjectAt( index );
-    this.props.onRowClickCallback( row );
+  _onRowClick(event, index) {
+    console.log('here is the event:', event,
+      'the index:', index);
+    alert(this.props.onRowClickCallback);
+    let row = this.state.sortedDataList.getObjectAt(index);
+    this.props.onRowClickCallback(row);
+  }
+
+  _onCellClick(event, column, data ) {
+    alert('hey..' + column + ' ' + this.props.onCellClickCallback);
+    this.props.onCellClickCallback( column, data )
+
   }
 
   render() {
@@ -352,7 +383,7 @@ class SuperTable extends React.Component {
           height={this.props.height ? this.props.height : 500}
           isColumnResizing={false}
           onColumnResizeEndCallback={this._onColumnResizeEndCallback}
-          onRowClick={this._onRowClick.bind(this)}
+          //onRowClick={this._onRowClick.bind(this)}
           {...this.props}>
 
           {this._columnMeta.map((col, index) => {
@@ -367,17 +398,19 @@ class SuperTable extends React.Component {
                   {col.header}
                 </SortHeaderCell>
               }
-              
+
               isResizable={col.resize ? col.resize : true}
-              cell={<TextCell data={sortedDataList} />}
+              cell={<TextCell onClick={this._onCellClick.bind(this)} data={sortedDataList} name={col.attribute} />}
               width={this.state.columnWidths[col.attribute]}
-              //minWidth={col.minWidth ? col.minWidth : 0}
-              //maxWidth={col.maxWidth ? col.maxWidth : 222}
-              
+
+            //minWidth={col.minWidth ? col.minWidth : 0}
+            //maxWidth={col.maxWidth ? col.maxWidth : 222}
+
             />
           })}
 
         </Table>
+
         <button onClick={this._onFilter.bind(this)}>Filter</button>
       </div>
     );
