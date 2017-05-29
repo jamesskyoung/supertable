@@ -30,8 +30,8 @@ function getColumnMetaData() {
     return [
         { 'header': 'ID', 'width': '5%', attribute: 'id', order: 1 },
         { 'header': 'Partner Status', 'width': '20%', attribute: 'partnerStatus', order: 2 },
-        { 'header': 'City', 'width': '45%', attribute: 'partnerCity', order: 3 },
-        { 'header': 'Level', 'width': '20%', attribute: 'partnerLevel', order: 4 },
+        { 'header': 'City', 'width': '45%', attribute: 'partnerCity', order: 3, resize: true },
+        { 'header': 'Level', 'width': '20%', attribute: 'partnerLevel', order: 4, maxWidth: 222 },
         { 'header': 'Created', 'width': '10%', attribute: 'created', order: 5 }
 
     ]

@@ -119,12 +119,15 @@ class SuperTable extends React.Component {
       sortedDataList: this._dataList,
       colSortDirs: {},
       displayMode: 'none',
-      tableWidth: 0
+      tableWidth: 0,
+      columnWidths: {}
     };
 
     this._onSortChange = this._onSortChange.bind(this);
-
+    this._onColumnResizeEndCallback = this._onColumnResizeEndCallback.bind(this);
   }
+
+
 
   /**
    * Will mount = DOM ready.  We can use ReactDOM to find our elements via refs.
@@ -133,38 +136,47 @@ class SuperTable extends React.Component {
    * 
    */
   componentDidMount() {
-    console.log( '**********************************');
-    if ( _.isNumber(  this.props.tableWidth )) {
-      console.log( 'Table width is numeric.. just return.' );
+    console.log('**********************************');
+    if (_.isNumber(this.props.tableWidth)) {
+      console.log('Table width is numeric.. just return.');
       return;
     }
-    let tableWidth = parseInt( this.props.tableWidth.replace( '%', '') );
-    console.log( 'twipercentixels: ' + tableWidth )
+    let tableWidth = parseInt(this.props.tableWidth.replace('%', ''));
+    console.log('twipercentixels: ' + tableWidth)
     let table = ReactDOM.findDOMNode(this.refs.superTable);
     let rect = table.getBoundingClientRect();
-    let tableWidthPixels = rect.width * (tableWidth / 100 );
+    let tableWidthPixels = rect.width * (tableWidth / 100);
 
     console.log(rect);
-    console.log( 'Table width in pixels..' + tableWidthPixels );
-    console.log( '**********************************');
+    console.log('Table width in pixels..' + tableWidthPixels);
+    console.log('**********************************');
     let tableInPercentage = false;
 
-    this._columnMeta.map( (colObj, index ) => {
-      console.log( 'cdm: is a number..? ' + colObj.width )
-      let colWidth;
-      if ( !_.isNumber(  colObj.percentage )) {
+    this._columnMeta.map((colObj, index) => {
+      console.log('cdm: is a number..? ' + colObj.width)
+
+      if (!_.isNumber(colObj.percentage)) {
         tableInPercentage = true;
-        console.log( 'cdm: false..' + colObj.percentage)
-        let percent = parseInt( colObj.percentage.replace( '%', '') );
-        console.log( 'percentage is: ' + percent );
-        let newWidth = tableWidthPixels * (percent / 100 );
-        console.log( 'Table width: ' + tableWidthPixels + ' Percentage: ' + colObj.percentage + ' new width: ' + newWidth );
+        console.log('cdm: false..' + colObj.percentage)
+        let percent = parseInt(colObj.percentage.replace('%', ''));
+        console.log('percentage is: ' + percent);
+        let newWidth = tableWidthPixels * (percent / 100);
+        console.log('Table width: ' + tableWidthPixels + ' Percentage: ' + colObj.percentage + ' new width: ' + newWidth);
         colObj.width = newWidth;
-      } 
+      }
     });
 
-    if ( tableInPercentage ) {
-      this.setState( { displayMode: 'block', tableWidth: tableWidthPixels} );
+    let columnWidths = {};
+    this._columnMeta.map((colObj, index) => {
+      columnWidths[colObj.attribute] = colObj.width;
+
+      console.log('zzz ' + columnWidths[colObj.attribute]);
+    });
+
+    if (tableInPercentage) {
+      this.setState({ displayMode: 'block', tableWidth: tableWidthPixels, columnWidths: columnWidths });
+    } else {
+      this.setState({ columnWidths: columnWidths });
     }
   }
 
@@ -178,8 +190,10 @@ class SuperTable extends React.Component {
     this._setWidths();
 
     this.setState(
-      { dataAttrNames: dataAttrNames,
-        tableWidth: this._tableWidth }
+      {
+        dataAttrNames: dataAttrNames,
+        tableWidth: this._tableWidth
+      }
     );
 
   }
@@ -202,7 +216,7 @@ class SuperTable extends React.Component {
   _setColumnMetaData(dataAttrNames) {
 
     if (this._columnMeta === null) {
-     
+
       this._columnMeta = [];
       dataAttrNames.map((col, index) => {
         let colObj = {};
@@ -222,30 +236,46 @@ class SuperTable extends React.Component {
    * then just appoportion the column width equally.
    */
   _setWidths() {
-   
+    let columnWidths = {};
     let tableWidth = 0; //1000;
-    this._columnMeta.map( (colObj, index ) => {
-      console.log( 'sw: is a number..? ' + colObj.width )
-      let colWidth;
-      if ( !_.isNumber(  colObj.width )) {
+    this._columnMeta.map((colObj, index) => {
+      console.log('sw: is a number..? ' + colObj.width)
+      let columnWidths = {};
+      if (!_.isNumber(colObj.width)) {
         colObj.percentage = colObj.width;
-        console.log( 'sw: not a number..' + colObj.width + ' percentage? ' + colObj.percentage );
-       
+        console.log('sw: not a number..' + colObj.width + ' percentage? ' + colObj.percentage);
+
         colObj.width = 100;
-      } 
+      }
+      columnWidths[colObj.attribute] = colObj.width;
+      console.log('xxxx ' + columnWidths[colObj.header]);
       tableWidth += colObj.width;
-      console.log( colObj.header + '___' + colObj.width );
+      console.log(colObj.header + '___' + colObj.width);
       //tableWidth += colObj.width;
     });
-    
+
     this._tableWidth = tableWidth;
-    
+
+    this.setState({ columnWidths: columnWidths });
+
   }
 
   _setWidthFromTable() {
-    alert( this.props.tableWidth);
+    alert(this.props.tableWidth);
 
   }
+
+  _onColumnResizeEndCallback(newColumnWidth, columnKey) {
+
+    this.setState(({ columnWidths }) => ({
+      columnWidths: {
+        ...columnWidths,
+        [columnKey]: newColumnWidth,
+      }
+    }));
+
+  }
+
   _onSortChange(columnKey, sortDir) {
     var sortIndexes = this._defaultSortIndexes.slice();
     sortIndexes.sort((indexA, indexB) => {
@@ -278,14 +308,14 @@ class SuperTable extends React.Component {
 
     let tempList = [];
     /* Iterate thru all columns matching text to value */
-    this._dataList.map(( row, index) => {
-      console.log( 'Row is: ' + row.id + ' ' + index );
+    this._dataList.map((row, index) => {
+      console.log('Row is: ' + row.id + ' ' + index);
     });
   }
 
 
   render() {
-    if (this.state.dataAttrNames.length === 0 || this.state.tableWidth === 0 ) {
+    if (this.state.dataAttrNames.length === 0 || this.state.tableWidth === 0) {
       return <span />
     }
 
@@ -294,38 +324,47 @@ class SuperTable extends React.Component {
     this._columnMeta.map((col, index) => {
       console.log('in render: ' + col.header + ' ' + col.attribute + ' ' + col.width);
     });
-    console.log( ' Table width: ' + this.state.tableWidth )
+    console.log(' Table width: ' + this.state.tableWidth)
+    console.log('column widths: ' + this.state.columnWidths);
+
     // calculate widths
     // table width an dindividual cell widths (if not provided.)
     return (
       <div ref='superTable' >
-      <Table style={{display: this.state.displayMode}}
-        rowHeight={this.props.rowHeight ? this.props.rowHeight : 50}
-        rowsCount={sortedDataList.getSize()}
-        headerHeight={this.props.headerHeight ? this.props.headerHeight : 50}
-        width={this.state.tableWidth}
-        height={this.props.height ? this.props.height : 500}
-        {...this.props}>
+        <Table style={{ display: this.state.displayMode }}
+          rowHeight={this.props.rowHeight ? this.props.rowHeight : 50}
+          rowsCount={sortedDataList.getSize()}
+          headerHeight={this.props.headerHeight ? this.props.headerHeight : 50}
+          width={this.state.tableWidth}
+          height={this.props.height ? this.props.height : 500}
+          isColumnResizing={false}
+          onColumnResizeEndCallback={this._onColumnResizeEndCallback}
+          {...this.props}>
 
-        {this._columnMeta.map((col, index) => { 
-         
-          return <Column 
-            key={index}
-            columnKey={col.attribute}
-            header={
-              <SortHeaderCell
-                onSortChange={this._onSortChange}
-                sortDir={colSortDirs[col.attribute]}>
-                {col.header}
-              </SortHeaderCell>
-            }
-            cell={<TextCell data={sortedDataList} />}
-            width={col.width}
-          />
-        })}
+          {this._columnMeta.map((col, index) => {
 
-      </Table>
-      <button onClick={this._onFilter.bind(this)}>Filter</button>
+            return <Column
+              key={index}
+              columnKey={col.attribute}
+              header={
+                <SortHeaderCell
+                  onSortChange={this._onSortChange}
+                  sortDir={colSortDirs[col.attribute]}>
+                  {col.header}
+                </SortHeaderCell>
+              }
+              
+              isResizable={col.resize ? col.resize : true}
+              cell={<TextCell data={sortedDataList} />}
+              width={this.state.columnWidths[col.attribute]}
+              //minWidth={col.minWidth ? col.minWidth : 0}
+              //maxWidth={col.maxWidth ? col.maxWidth : 222}
+              
+            />
+          })}
+
+        </Table>
+        <button onClick={this._onFilter.bind(this)}>Filter</button>
       </div>
     );
   }
