@@ -11,10 +11,7 @@
  * TODO:
  * Paging.. only show rows x-y.   
  * Lazy loading.  Might only have 'x' rows... need api to update data array and repaint etc.. but also include paging info
- * Custom callbacks on:
- * APIs for 
- * Row clicked, cell clicked.. 
- * Get row object.. get cell object (row object is a collection of cell objects)
+ *
  * Set cell renderer
  * 
  */
@@ -72,14 +69,37 @@ class SortHeaderCell extends React.Component {
   }
 }
 
-const xTextCell = ({ rowIndex, data, columnKey, ...props }) => (
-  <Cell {...props} >
-    {data.getObjectAt(rowIndex)[columnKey]}
 
-  </Cell>
-);
+/**
+ * Default component to render data
+ */
+class CustomCell extends React.Component {
+  constructor(props) {
+    super(props);
+    this._name = this.props.name;
+    this._cellData = this.props.data.getObjectAt(this.props.rowIndex)[this.props.columnKey];
+    this._data = this.props.data.getObjectAt(this.props.rowIndex);
 
-//Button Component
+  }
+
+  clickEventHandler(e) {
+    
+    this.props.onClick(e, this.props.rowIndex, this._name, this._data);
+  }
+
+  render() {
+    let props = this.props;
+    return (
+      <Cell {...props} onClick={this.clickEventHandler.bind(this)}>
+        {this.props.renderer( this.props.rowIndex, this._data, this.props.columnKey )}
+      </Cell>
+    )
+  }
+}
+
+/**
+ * Default component to render data
+ */
 class TextCell extends React.Component {
   constructor(props) {
     super(props);
@@ -89,7 +109,7 @@ class TextCell extends React.Component {
   }
 
   clickEventHandler(e) {
-    this.props.onClick(e, this._name, this._data);
+    this.props.onClick(e, this.props.rowIndex, this._name, this._data);
   }
 
   render() {
@@ -102,6 +122,9 @@ class TextCell extends React.Component {
   }
 }
 
+/**
+ * Wrapper around our data
+ */
 class DataListWrapper {
   constructor(indexMap, data) {
     this._indexMap = indexMap;
@@ -132,10 +155,8 @@ class SuperTable extends React.Component {
 
     this._dataList = new SuperTableStore(props.data);
     this._columnMeta = props.columnMeta || null;
-    //  alert( this._columnMeta );
-
-
     this._defaultSortIndexes = [];
+ 
     var size = this._dataList.getSize();
     for (var index = 0; index < size; index++) {
       this._defaultSortIndexes.push(index);
@@ -147,8 +168,7 @@ class SuperTable extends React.Component {
       colSortDirs: {},
       displayMode: 'none',
       tableWidth: 0,
-      columnWidths: {},
-      caller: this.props.self
+      columnWidths: {}
     };
 
     this._onSortChange = this._onSortChange.bind(this);
@@ -158,29 +178,24 @@ class SuperTable extends React.Component {
 
 
   /**
-   * Will mount = DOM ready.  We can use ReactDOM to find our elements via refs.
+   * componentDidMount = DOM ready.  We can use ReactDOM to find our elements via refs.
    * 
    * IF this table is in percentages.. then adjust based on owning div size (found via ref)
    * 
    */
   componentDidMount() {
-    //return;
-    console.log('**********************************');
+    
     if (_.isNumber(this.props.tableWidth)) {
       console.log('Table width is numeric.. just return.');
       return;
     }
-    let tableWidth = parseInt(this.props.tableWidth.replace('%', ''));
-    console.log('twipercentixels: ' + tableWidth)
-    alert(ReactDOM.findDOMNode(this.refs.id));
 
+    let tableWidth = parseInt(this.props.tableWidth.replace('%', ''));
+ 
     let table = ReactDOM.findDOMNode(this.refs.superTable);
     let rect = table.getBoundingClientRect();
     let tableWidthPixels = rect.width * (tableWidth / 100);
 
-    console.log(rect);
-    console.log('Table width in pixels..' + tableWidthPixels);
-    console.log('**********************************');
     let tableInPercentage = false;
 
     this._columnMeta.map((colObj, index) => {
@@ -188,11 +203,8 @@ class SuperTable extends React.Component {
 
       if (!_.isNumber(colObj.percentage)) {
         tableInPercentage = true;
-        console.log('cdm: false..' + colObj.percentage)
         let percent = parseInt(colObj.percentage.replace('%', ''));
-        console.log('percentage is: ' + percent);
         let newWidth = tableWidthPixels * (percent / 100);
-        console.log('Table width: ' + tableWidthPixels + ' Percentage: ' + colObj.percentage + ' new width: ' + newWidth);
         colObj.width = Math.round(newWidth);
       }
     });
@@ -347,14 +359,13 @@ class SuperTable extends React.Component {
   _onRowClick(event, index) {
     console.log('here is the event:', event,
       'the index:', index);
-    alert(this.props.onRowClickCallback);
     let row = this.state.sortedDataList.getObjectAt(index);
     this.props.onRowClickCallback(row);
   }
 
-  _onCellClick(event, column, data ) {
-    alert('hey..' + column + ' ' + this.props.onCellClickCallback);
-    this.props.onCellClickCallback( column, data )
+  _onCellClick(event, index, column, data ) {
+   // alert('hey..' + column + ' ' + this.props.onCellClickCallback( column, data ));
+    this.props.onCellClickCallback( index, column, data )
 
   }
 
@@ -383,10 +394,14 @@ class SuperTable extends React.Component {
           height={this.props.height ? this.props.height : 500}
           isColumnResizing={false}
           onColumnResizeEndCallback={this._onColumnResizeEndCallback}
-          //onRowClick={this._onRowClick.bind(this)}
+          onRowClick={this._onRowClick.bind(this)}
           {...this.props}>
 
           {this._columnMeta.map((col, index) => {
+            let renderer = <TextCell onClick={this._onCellClick.bind(this)} data={sortedDataList} name={col.attribute} />
+            if ( undefined !== col.renderer ) {
+              renderer = <CustomCell renderer={col.renderer} onClick={this._onCellClick.bind(this)} data={sortedDataList} name={col.attribute} />
+            }
 
             return <Column
               key={index}
@@ -400,7 +415,7 @@ class SuperTable extends React.Component {
               }
 
               isResizable={col.resize ? col.resize : true}
-              cell={<TextCell onClick={this._onCellClick.bind(this)} data={sortedDataList} name={col.attribute} />}
+              cell={renderer}
               width={this.state.columnWidths[col.attribute]}
 
             //minWidth={col.minWidth ? col.minWidth : 0}
@@ -418,5 +433,7 @@ class SuperTable extends React.Component {
 }
 
 module.exports = SuperTable;
+
+// cell={<TextCell onClick={this._onCellClick.bind(this)} data={sortedDataList} name={col.attribute} />}
 
 
