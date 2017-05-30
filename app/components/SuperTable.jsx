@@ -18,11 +18,13 @@
 //fixedDataTableLayout_main public_fixedDataTable_main
 //box-shadow: 1px 2px 30px #888888;
 "use strict";
-
+import _ from 'lodash';
 import FixedDataTable from 'fixed-data-table';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import _ from 'lodash';
+
+import Filter from './Filter.jsx';
+
 require('../../node_modules/fixed-data-table/dist/fixed-data-table.css');
 import SuperTableStore from '../../app/SuperTableStore';
 
@@ -83,7 +85,7 @@ class CustomCell extends React.Component {
   }
 
   clickEventHandler(e) {
-    
+
     this.props.onClick(e, this.props.rowIndex, this._name, this._data);
   }
 
@@ -91,7 +93,7 @@ class CustomCell extends React.Component {
     let props = this.props;
     return (
       <Cell {...props} onClick={this.clickEventHandler.bind(this)}>
-        {this.props.renderer( this.props.rowIndex, this._data, this.props.columnKey )}
+        {this.props.renderer(this.props.rowIndex, this._data, this.props.columnKey)}
       </Cell>
     )
   }
@@ -103,9 +105,6 @@ class CustomCell extends React.Component {
 class TextCell extends React.Component {
   constructor(props) {
     super(props);
-    this._name = this.props.name;
-    this._cellData = this.props.data.getObjectAt(this.props.rowIndex)[this.props.columnKey];
-    this._data = this.props.data.getObjectAt(this.props.rowIndex);
   }
 
   clickEventHandler(e) {
@@ -114,6 +113,10 @@ class TextCell extends React.Component {
 
   render() {
     let props = this.props;
+    this._name = this.props.name;
+    this._cellData = this.props.data.getObjectAt(this.props.rowIndex)[this.props.columnKey];
+    this._data = this.props.data.getObjectAt(this.props.rowIndex);
+
     return (
       <Cell {...props} onClick={this.clickEventHandler.bind(this)}>
         {this._cellData}
@@ -156,7 +159,7 @@ class SuperTable extends React.Component {
     this._dataList = new SuperTableStore(props.data);
     this._columnMeta = props.columnMeta || null;
     this._defaultSortIndexes = [];
- 
+
     var size = this._dataList.getSize();
     for (var index = 0; index < size; index++) {
       this._defaultSortIndexes.push(index);
@@ -184,15 +187,19 @@ class SuperTable extends React.Component {
    * 
    */
   componentDidMount() {
-    
+
     if (_.isNumber(this.props.tableWidth)) {
       console.log('Table width is numeric.. just return.');
       return;
     }
 
     let tableWidth = parseInt(this.props.tableWidth.replace('%', ''));
- 
+
     let table = ReactDOM.findDOMNode(this.refs.superTable);
+    if (table === null) {
+      return;
+    }
+
     let rect = table.getBoundingClientRect();
     let tableWidthPixels = rect.width * (tableWidth / 100);
 
@@ -205,21 +212,20 @@ class SuperTable extends React.Component {
         tableInPercentage = true;
         let percent = parseInt(colObj.percentage.replace('%', ''));
         let newWidth = tableWidthPixels * (percent / 100);
-        colObj.width = Math.round(newWidth);
+        colObj.width = Math.floor(newWidth);
       }
     });
 
     let columnWidths = {};
     this._columnMeta.map((colObj, index) => {
       columnWidths[colObj.attribute] = colObj.width;
-
       console.log('zzz ' + columnWidths[colObj.attribute]);
     });
 
     if (tableInPercentage) {
       this.setState({ displayMode: 'block', tableWidth: tableWidthPixels, columnWidths: columnWidths });
     } else {
-      this.setState({ columnWidths: columnWidths });
+      this.setState({ displayMode: 'block', columnWidths: columnWidths });
     }
   }
 
@@ -347,14 +353,47 @@ class SuperTable extends React.Component {
     });
   }
 
-  _onFilter(filterText) {
+  _onFilterChange(e) {
+    if (!e.target.value) {
+      this.setState({
+        sortedDataList: this._dataList,
+      });
+    }
 
-    let tempList = [];
-    /* Iterate thru all columns matching text to value */
-    this._dataList.map((row, index) => {
-      console.log('Row is: ' + row.id + ' ' + index);
+    var filterBy = e.target.value.toLowerCase();
+    var size = this._dataList.getSize();
+    var filteredData = [];
+    for (var index = 0; index < size; index++) {
+     
+      var dataObj = this._dataList.getObjectAt(index);
+      for (var columnIndex = 0; columnIndex < this._columnMeta.length; columnIndex++) {
+        var col = this._columnMeta[columnIndex];
+        let value = dataObj[col.attribute];
+        if (_.isNumber(value)) {
+          value = value.toString();
+        }
+
+        if (value.toLowerCase().indexOf(filterBy) !== -1) {
+          filteredData.push(dataObj);
+          break;
+        }
+
+      }
+     
+    }
+
+    let newDataList = new SuperTableStore(filteredData)
+    this._defaultSortIndexes = [];
+    var size = newDataList.getSize();
+    for (var index = 0; index < size; index++) {
+      this._defaultSortIndexes.push(index);
+    }
+
+    this.setState({
+      sortedDataList: newDataList
     });
   }
+
 
   _onRowClick(event, index) {
     console.log('here is the event:', event,
@@ -363,30 +402,38 @@ class SuperTable extends React.Component {
     this.props.onRowClickCallback(row);
   }
 
-  _onCellClick(event, index, column, data ) {
-   // alert('hey..' + column + ' ' + this.props.onCellClickCallback( column, data ));
-    this.props.onCellClickCallback( index, column, data )
+  _onCellClick(event, index, column, data) {
+    // alert('hey..' + column + ' ' + this.props.onCellClickCallback( column, data ));
+    this.props.onCellClickCallback(index, column, data)
 
   }
 
   render() {
+
     if (this.state.dataAttrNames.length === 0 || this.state.tableWidth === 0) {
       return <span />
     }
 
     var { sortedDataList, colSortDirs } = this.state;
 
-    this._columnMeta.map((col, index) => {
-      console.log('in render: ' + col.header + ' ' + col.attribute + ' ' + col.width);
-    });
-    console.log(' Table width: ' + this.state.tableWidth)
-    console.log('column widths: ' + this.state.columnWidths);
+    let filterState = { display: 'block' };
+
+    if (this.props.showFilter !== undefined && !this.props.showFilter) {
+      filterState = { display: 'none' }
+    }
 
     // calculate widths
     // table width an dindividual cell widths (if not provided.)
     return (
       <div ref='superTable' >
-        <Table style={{ display: this.state.displayMode }}
+        <div style={filterState}>
+          <input
+            onChange={this._onFilterChange.bind(this)}
+            placeholder="Filter by First Name" />
+        </div>
+
+
+        <Table
           rowHeight={this.props.rowHeight ? this.props.rowHeight : 50}
           rowsCount={sortedDataList.getSize()}
           headerHeight={this.props.headerHeight ? this.props.headerHeight : 50}
@@ -399,7 +446,7 @@ class SuperTable extends React.Component {
 
           {this._columnMeta.map((col, index) => {
             let renderer = <TextCell onClick={this._onCellClick.bind(this)} data={sortedDataList} name={col.attribute} />
-            if ( undefined !== col.renderer ) {
+            if (undefined !== col.renderer) {
               renderer = <CustomCell renderer={col.renderer} onClick={this._onCellClick.bind(this)} data={sortedDataList} name={col.attribute} />
             }
 
@@ -425,8 +472,6 @@ class SuperTable extends React.Component {
           })}
 
         </Table>
-
-        <button onClick={this._onFilter.bind(this)}>Filter</button>
       </div>
     );
   }

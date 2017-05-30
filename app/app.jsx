@@ -4,14 +4,23 @@ import SuperTable from './components/SuperTable.jsx';
 
 
 let data = [];
-let dataSize = 200;
+let dataSize = 5;
+let xswitch = true;
+
 for (var i = 0; i < dataSize; i++) {
+    let pl = '3rd party';
+    if ( xswitch) {
+        pl = '1st Party';
+        xswitch = false;
+    } else {
+        xswitch = true;
+    }
     var obj = {
         id: i,
         partnerName: 'name_' + i,
         partnerStatus: 'active',
-        partnerCity: 'London',
-        partnerLevel: '3rd Party',
+        partnerCity: 'London_' + Math.random(),
+        partnerLevel: pl,
         created: new Date().getTime()
     }
     data.push(obj);
@@ -31,7 +40,7 @@ function getColumnMetaData() {
     return [
         { 'header': 'ID', 'width': '5%', attribute: 'id', order: 1 },
         { 'header': 'Partner Status', 'width': '20%', attribute: 'partnerStatus', order: 2 },
-        { 'header': 'City', 'width': '45%', attribute: 'partnerCity', order: 3, resize: true, renderer: customRender },
+        { 'header': 'City', 'width': '45%', attribute: 'partnerCity', order: 3, resize: true, xrenderer: customRender },
         { 'header': 'Level', 'width': '20%', attribute: 'partnerLevel', order: 4, maxWidth: 222 },
         { 'header': 'Created', 'width': '10%', attribute: 'created', order: 5 }
 
@@ -60,11 +69,12 @@ ReactDOM.render(
     <div>
         <h1>Hello!</h1>
         <SuperTable 
-            tableWidth={'100%'}
-            data={data}
             columnMeta={ getColumnMetaData() }
+            data={data}
             onCellClickCallback={cellClick}
             onRowClickCallback={rowClick}
+            tableWidth={'100%'}
+            
             
         />
     </div>,
