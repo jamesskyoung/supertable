@@ -4,7 +4,7 @@ import SuperTable from './components/SuperTable.jsx';
 
 
 let data = [];
-let dataSize = 5;
+let dataSize = 10000;
 let xswitch = true;
 
 for (var i = 0; i < dataSize; i++) {
@@ -67,15 +67,22 @@ function customRender( rowIndex, data, columnKey ) {
 
 ReactDOM.render(
     <div>
-        <h1>Hello!</h1>
+        <h1>PMDB Datatable!</h1>
         <SuperTable 
             columnMeta={ getColumnMetaData() }
             data={data}
+            filterPlaceholder='Filter this data..yyy.'
+            showText={'Show'}
+            itemsPerPageText='items per page'
             onCellClickCallback={cellClick}
             onRowClickCallback={rowClick}
-            tableWidth={'100%'}
-            
-            
+            xrowsPerPage={5}
+            showItemsPerPage={true}
+            showPagination={true}
+            showTotalRowCount={true}
+            tableHeight={500}
+            tableWidth={'75%'}
+            totalRowCountText='items found'
         />
     </div>,
     document.getElementById('app')

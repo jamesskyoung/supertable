@@ -23,7 +23,6 @@ import FixedDataTable from 'fixed-data-table';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import Filter from './Filter.jsx';
 
 require('../../node_modules/fixed-data-table/dist/fixed-data-table.css');
 import SuperTableStore from '../../app/SuperTableStore';
@@ -165,19 +164,35 @@ class SuperTable extends React.Component {
       this._defaultSortIndexes.push(index);
     }
 
+    // Get rows per page from local storage... if null, use props
+    let rowsPerPage = localStorage.getItem("pmdb_rowsPerPage");
+
+    if ( rowsPerPage == null ) {
+      rowsPerPage = this.props.rowsPerPage === undefined ? 0 : this.props.rowsPerPage;
+    }
+
     this.state = {
-      dataAttrNames: [],
-      sortedDataList: this._dataList,
+      columnWidths: {},
       colSortDirs: {},
-      displayMode: 'none',
-      tableWidth: 0,
-      columnWidths: {}
+      dataAttrNames: [],
+      filterBy: '',
+      rowsPerPage: rowsPerPage,
+      sortedDataList: this._dataList,
+      startPageRow: 0,
+      tableWidth: 0
     };
 
+    this._tableHeight = this.props.tableHeight,
+      this._visibleRows = size;
     this._onSortChange = this._onSortChange.bind(this);
     this._onColumnResizeEndCallback = this._onColumnResizeEndCallback.bind(this);
   }
 
+  /******************************************************************************************
+   * 
+   * Keep React lifecycle methods at the top of this source file
+   * 
+   *****************************************************************************************/
 
 
   /**
@@ -223,12 +238,17 @@ class SuperTable extends React.Component {
     });
 
     if (tableInPercentage) {
-      this.setState({ displayMode: 'block', tableWidth: tableWidthPixels, columnWidths: columnWidths });
+      this.setState({ tableWidth: tableWidthPixels, columnWidths: columnWidths });
     } else {
-      this.setState({ displayMode: 'block', columnWidths: columnWidths });
+      this.setState({ columnWidths: columnWidths });
     }
+
   }
 
+  /**
+   * Called before component is placed into the DOM.  use this like you would 
+   * an init function etc.
+   */
   componentWillMount() {
 
     // get all attribute names from the data..
@@ -248,13 +268,55 @@ class SuperTable extends React.Component {
   }
 
   /**
+  * Filter dataset based on filterBy 
+  * 
+  * We also adjust the table height here too...
+  * 
+  * @param {*} filterBy 
+  * @return filtered list (array)
+  */
+  _doFilter(filterBy) {
+
+    var size = this._dataList.getSize();
+    var filteredData = [];
+    for (var index = 0; index < size; index++) {
+
+      var dataObj = this._dataList.getObjectAt(index);
+      for (var columnIndex = 0; columnIndex < this._columnMeta.length; columnIndex++) {
+        var col = this._columnMeta[columnIndex];
+        let value = dataObj[col.attribute];
+        if (_.isNumber(value)) {
+          value = value.toString();
+        }
+
+        if (value.toLowerCase().indexOf(filterBy) !== -1) {
+          filteredData.push(dataObj);
+          break;
+        }
+      }
+    }
+
+    let newDataList = new SuperTableStore(filteredData)
+    this._defaultSortIndexes = [];
+    var size = newDataList.getSize();
+    for (var index = 0; index < size; index++) {
+      this._defaultSortIndexes.push(index);
+    }
+
+    // Store
+    this._visibleRows = size;
+    return newDataList;
+
+  }
+
+
+  /**
    * Set the attribute names in our state.
    */
   _getDataAttributes(row) {
 
     let dataAttrNames = [];
     for (var name in row) {
-      console.log('Name: ' + name);
       dataAttrNames.push(name)
     }
 
@@ -262,6 +324,174 @@ class SuperTable extends React.Component {
 
   }
 
+  /**
+   * Return a page of data..
+   */
+  _getPage(sortedDataList) {
+    console.log('Sorteddata list length is: ' + sortedDataList.getSize());
+    if (0 === this.state.rowsPerPage) {
+      return sortedDataList;
+    }
+    
+    let rowsToReturn = this.state.rowsPerPage;
+    if (rowsToReturn > sortedDataList.getSize()) {
+      rowsToReturn = sortedDataList.getSize();
+    }
+    let viewPage = []
+    for (var index = 0; index < rowsToReturn; index++) {
+      var dataObj = sortedDataList.getObjectAt(index);
+      viewPage.push(dataObj)
+    }
+
+    return new SuperTableStore(viewPage)
+
+  }
+
+
+  /**
+   * Compute real table height.
+   * 
+   * height = visible rows * row_height + header_height
+   * If this is less than props.tableHeight, then use that.
+   * 
+   * Why do we do this?  Pagination generally appears after the table -- along with 
+   * other 'controls'.  SO useful to have them appear right afte rthe table.
+   * 
+   * Generally, this is effective when the data is filtered.
+   * 
+   */
+  _getTableHeight() {
+
+    // Compute table height...
+    let th = (this.props.tableHeight === undefined ? this.props.tableHeight : 500);
+    let rh = (this.props.rowHeight ? this.props.rowHeight : 50);
+    let hh = (this.props.headerHeight ? this.props.headerHeight : 50);
+    th = this._visibleRows * rh + hh;
+    if (th < this.props.tableHeight) {
+      return th;
+    } else {
+      return this.props.tableHeight;
+    }
+  }
+
+  /**
+   * CELL Click event.. if we have a cell click handler, call it 
+   * @param {*} event 
+   * @param {*} index 
+   * @param {*} column 
+   * @param {*} data 
+   */
+  _onCellClick(event, index, column, data) {
+    // alert('hey..' + column + ' ' + this.props.onCellClickCallback( column, data ));
+    this.props.onCellClickCallback(index, column, data)
+  }
+
+  /**
+   * Change numbe rof rows per page to be viewed.
+   * @param {*} e 
+   */
+  _onChangeRowsPerPage(e) {
+    
+    localStorage.setItem("pmdb_rowsPerPage", parseInt( e.target.value ) );
+    this.setState( { rowsPerPage: parseInt( e.target.value )});
+
+
+  }
+
+  /**
+   * Called after resize is done
+   * @param {*} newColumnWidth 
+   * @param {*} columnKey 
+   */
+  _onColumnResizeEndCallback(newColumnWidth, columnKey) {
+
+    this.setState(({ columnWidths }) => ({
+      columnWidths: {
+        ...columnWidths,
+        [columnKey]: newColumnWidth,
+      }
+    }));
+
+  }
+
+  /**
+    * Filter current dataset.  
+    * @see _doFilter
+    * 
+    * @param {*} e 
+    */
+  _onFilterChange(e) {
+    if (!e.target.value) {
+      this.setState({
+        sortedDataList: this._dataList,
+      });
+    }
+
+    let filterBy = e.target.value.toLowerCase();
+    let newDataList = this._doFilter(filterBy);
+    this.setState({
+      sortedDataList: newDataList,
+      filterBy: filterBy
+    });
+  }
+
+  /**
+   * Row has been clicked.. call handler (if present)
+   * @param {*} event 
+   * @param {*} index 
+   */
+  _onRowClick(event, index) {
+    console.log('here is the event:', event,
+      'the index:', index);
+    let row = this.state.sortedDataList.getObjectAt(index);
+    this.props.onRowClickCallback(row);
+  }
+
+
+  /**
+   * Sort data set by column
+   * @todo: 
+   * @param {*} columnKey 
+   * @param {*} sortDir 
+   */
+  _onSortChange(columnKey, sortDir) {
+    var sortIndexes = this._defaultSortIndexes.slice();
+    sortIndexes.sort((indexA, indexB) => {
+      var valueA = this._dataList.getObjectAt(indexA)[columnKey];
+      var valueB = this._dataList.getObjectAt(indexB)[columnKey];
+      var sortVal = 0;
+
+      if (valueA > valueB) {
+        sortVal = 1;
+      }
+      if (valueA < valueB) {
+        sortVal = -1;
+      }
+      if (sortVal !== 0 && sortDir === SortTypes.ASC) {
+        sortVal = sortVal * -1;
+      }
+
+      return sortVal;
+    });
+
+    let filterList = this._dataList;
+    if (this.state.filterBy.length > 0) {
+      // We have a filter.. use it.
+      filterList = this._doFilter(this.state.filterBy);
+    }
+
+    this.setState({
+      sortedDataList: new DataListWrapper(sortIndexes, filterList /*this._dataList */),
+      colSortDirs: {
+        [columnKey]: sortDir
+      },
+    });
+  }
+
+  /**
+    * 
+    * @param {*} dataAttrNames 
+    */
   _setColumnMetaData(dataAttrNames) {
 
     if (this._columnMeta === null) {
@@ -288,126 +518,26 @@ class SuperTable extends React.Component {
     let columnWidths = {};
     let tableWidth = 0; //1000;
     this._columnMeta.map((colObj, index) => {
-      console.log('sw: is a number..? ' + colObj.width)
+
       let columnWidths = {};
       if (!_.isNumber(colObj.width)) {
         colObj.percentage = colObj.width;
-        console.log('sw: not a number..' + colObj.width + ' percentage? ' + colObj.percentage);
-
         colObj.width = 100;
       }
       columnWidths[colObj.attribute] = colObj.width;
-      console.log('xxxx ' + columnWidths[colObj.attribute]);
       tableWidth += colObj.width;
-      console.log(colObj.header + '___' + colObj.width);
-      //tableWidth += colObj.width;
     });
 
     this._tableWidth = tableWidth;
-
     this.setState({ columnWidths: columnWidths });
 
   }
 
-  _setWidthFromTable() {
-    alert(this.props.tableWidth);
-
-  }
-
-  _onColumnResizeEndCallback(newColumnWidth, columnKey) {
-
-    this.setState(({ columnWidths }) => ({
-      columnWidths: {
-        ...columnWidths,
-        [columnKey]: newColumnWidth,
-      }
-    }));
-
-  }
-
-  _onSortChange(columnKey, sortDir) {
-    var sortIndexes = this._defaultSortIndexes.slice();
-    sortIndexes.sort((indexA, indexB) => {
-      var valueA = this._dataList.getObjectAt(indexA)[columnKey];
-      var valueB = this._dataList.getObjectAt(indexB)[columnKey];
-      var sortVal = 0;
-
-      if (valueA > valueB) {
-        sortVal = 1;
-      }
-      if (valueA < valueB) {
-        sortVal = -1;
-      }
-      if (sortVal !== 0 && sortDir === SortTypes.ASC) {
-        sortVal = sortVal * -1;
-      }
-
-      return sortVal;
-    });
-
-    this.setState({
-      sortedDataList: new DataListWrapper(sortIndexes, this._dataList),
-      colSortDirs: {
-        [columnKey]: sortDir,
-      },
-    });
-  }
-
-  _onFilterChange(e) {
-    if (!e.target.value) {
-      this.setState({
-        sortedDataList: this._dataList,
-      });
-    }
-
-    var filterBy = e.target.value.toLowerCase();
-    var size = this._dataList.getSize();
-    var filteredData = [];
-    for (var index = 0; index < size; index++) {
-     
-      var dataObj = this._dataList.getObjectAt(index);
-      for (var columnIndex = 0; columnIndex < this._columnMeta.length; columnIndex++) {
-        var col = this._columnMeta[columnIndex];
-        let value = dataObj[col.attribute];
-        if (_.isNumber(value)) {
-          value = value.toString();
-        }
-
-        if (value.toLowerCase().indexOf(filterBy) !== -1) {
-          filteredData.push(dataObj);
-          break;
-        }
-
-      }
-     
-    }
-
-    let newDataList = new SuperTableStore(filteredData)
-    this._defaultSortIndexes = [];
-    var size = newDataList.getSize();
-    for (var index = 0; index < size; index++) {
-      this._defaultSortIndexes.push(index);
-    }
-
-    this.setState({
-      sortedDataList: newDataList
-    });
-  }
 
 
-  _onRowClick(event, index) {
-    console.log('here is the event:', event,
-      'the index:', index);
-    let row = this.state.sortedDataList.getObjectAt(index);
-    this.props.onRowClickCallback(row);
-  }
-
-  _onCellClick(event, index, column, data) {
-    // alert('hey..' + column + ' ' + this.props.onCellClickCallback( column, data ));
-    this.props.onCellClickCallback(index, column, data)
-
-  }
-
+  /**
+   * REACT Render method.
+   */
   render() {
 
     if (this.state.dataAttrNames.length === 0 || this.state.tableWidth === 0) {
@@ -415,63 +545,87 @@ class SuperTable extends React.Component {
     }
 
     var { sortedDataList, colSortDirs } = this.state;
-
-    let filterState = { display: 'block' };
+    let filterState = { display: 'block', clear: 'both', float: 'left' };
 
     if (this.props.showFilter !== undefined && !this.props.showFilter) {
       filterState = { display: 'none' }
     }
 
+    var viewList = this._getPage(sortedDataList);
+    //viewList = sortedDataList;
     // calculate widths
     // table width an dindividual cell widths (if not provided.)
     return (
       <div ref='superTable' >
-        <div style={filterState}>
-          <input
-            onChange={this._onFilterChange.bind(this)}
-            placeholder="Filter by First Name" />
+        <div style={{ width: this.state.tableWidth }}>
+          <div style={filterState}>
+            <input
+              onChange={this._onFilterChange.bind(this)}
+              placeholder={this.props.filterPlaceholder} />
+          </div>
+          <div style={{ float: 'right' }}>
+            {sortedDataList.getSize()} {this.props.totalRowCountText}
+          </div>
         </div>
 
+        <div style={{ clear: 'both' }}>
+          <Table
+            rowHeight={this.props.rowHeight ? this.props.rowHeight : 50}
+            rowsCount={viewList.getSize()}
+            headerHeight={this.props.headerHeight ? this.props.headerHeight : 50}
+            width={this.state.tableWidth}
+            //height={this.props.tableHeight ? this.props.tableHeight : 500}
+            height={this._getTableHeight()}
+            isColumnResizing={false}
+            onColumnResizeEndCallback={this._onColumnResizeEndCallback}
+            onRowClick={this._onRowClick.bind(this)}
+            {...this.props}>
 
-        <Table
-          rowHeight={this.props.rowHeight ? this.props.rowHeight : 50}
-          rowsCount={sortedDataList.getSize()}
-          headerHeight={this.props.headerHeight ? this.props.headerHeight : 50}
-          width={this.state.tableWidth}
-          height={this.props.height ? this.props.height : 500}
-          isColumnResizing={false}
-          onColumnResizeEndCallback={this._onColumnResizeEndCallback}
-          onRowClick={this._onRowClick.bind(this)}
-          {...this.props}>
-
-          {this._columnMeta.map((col, index) => {
-            let renderer = <TextCell onClick={this._onCellClick.bind(this)} data={sortedDataList} name={col.attribute} />
-            if (undefined !== col.renderer) {
-              renderer = <CustomCell renderer={col.renderer} onClick={this._onCellClick.bind(this)} data={sortedDataList} name={col.attribute} />
-            }
-
-            return <Column
-              key={index}
-              columnKey={col.attribute}
-              header={
-                <SortHeaderCell
-                  onSortChange={this._onSortChange}
-                  sortDir={colSortDirs[col.attribute]}>
-                  {col.header}
-                </SortHeaderCell>
+            {this._columnMeta.map((col, index) => {
+              let renderer = <TextCell onClick={this._onCellClick.bind(this)} data={viewList} name={col.attribute} />
+              if (undefined !== col.renderer) {
+                renderer = <CustomCell renderer={col.renderer} onClick={this._onCellClick.bind(this)} data={viewList} name={col.attribute} />
               }
 
-              isResizable={col.resize ? col.resize : true}
-              cell={renderer}
-              width={this.state.columnWidths[col.attribute]}
+              return <Column
+                key={index}
+                columnKey={col.attribute}
+                header={
+                  <SortHeaderCell
+                    onSortChange={this._onSortChange}  // Causes warning.. ignore it
+                    sortDir={colSortDirs[col.attribute]}>
+                    {col.header}
+                  </SortHeaderCell>
+                }
 
-            //minWidth={col.minWidth ? col.minWidth : 0}
-            //maxWidth={col.maxWidth ? col.maxWidth : 222}
+                isResizable={col.resize ? col.resize : true}
+                cell={renderer}
+                width={this.state.columnWidths[col.attribute] === undefined ? 10 : this.state.columnWidths[col.attribute]}
 
-            />
-          })}
+              //minWidth={col.minWidth ? col.minWidth : 0}
+              //maxWidth={col.maxWidth ? col.maxWidth : 222}
 
-        </Table>
+              />
+            })}
+          </Table>
+          <h1>After table</h1>
+          <div style={{ clear: 'both', float: 'left', width: this.state.tableWidth }}>
+            <div style={{ width: '33.3%', float: 'left' }}>{this.props.showText}
+              &nbsp;
+              <select value={this.state.rowsPerPage} onChange={( event) => this._onChangeRowsPerPage( event )}>
+                <option>10</option>
+                <option>20</option>
+                <option>50</option>
+                <option>100</option>
+              </select>
+              &nbsp;
+              {this.props.itemsPerPageText}
+            </div>
+            <div style={{ width: '33.3%', float: 'left', textAlign: 'center' }}>Page x of y</div>
+            <div style={{ width: '33.3%', float: 'left', textAlign: 'right' }}>Chevrons...</div>
+          </div>
+
+        </div>
       </div>
     );
   }
