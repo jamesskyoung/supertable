@@ -4,7 +4,7 @@ import SuperTable from './components/SuperTable.jsx';
 
 
 let data = [];
-let dataSize = 10000;
+let dataSize = 105;
 let xswitch = true;
 
 for (var i = 0; i < dataSize; i++) {
@@ -76,9 +76,9 @@ ReactDOM.render(
             itemsPerPageText='items per page'
             onCellClickCallback={cellClick}
             onRowClickCallback={rowClick}
-            xrowsPerPage={5}
+            rowsPerPage={5}
             showItemsPerPage={true}
-            showPagination={true}
+            showPagination={false}
             showTotalRowCount={true}
             tableHeight={500}
             tableWidth={'75%'}

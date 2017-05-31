@@ -152,7 +152,6 @@ class SuperTable extends React.Component {
 
   constructor(props) {
     super(props);
-    console.log('The data length is: ' + props.data.length);
 
     this._dataList = new SuperTableStore(props.data);
     this._columnMeta = props.columnMeta || null;
@@ -229,7 +228,6 @@ class SuperTable extends React.Component {
     let tableInPercentage = false;
 
     this._columnMeta.map((colObj, index) => {
-      console.log('cdm: is a number..? ' + colObj.width)
 
       if (!_.isNumber(colObj.percentage)) {
         tableInPercentage = true;
@@ -352,19 +350,19 @@ class SuperTable extends React.Component {
     let endRow = currentRow + rowsToReturn;
 
     for (currentRow; currentRow < endRow; currentRow++) {
-      console.log('CurrentRow: ' + currentRow + ' SortedDL: ' + sortedDataList.getSize());
-      var dataObj = sortedDataList.getObjectAt(currentRow);
-      viewPage.push(dataObj);
       if (currentRow === sortedDataList.getSize()) {
-        console.log('reached the end!..');
         break;
       }
+      var dataObj = sortedDataList.getObjectAt(currentRow);
+      viewPage.push(dataObj);
     }
 
     if (this.state.shouldRender) {
       // Only update if we can show the table...
       this._currentRow = currentRow;
     }
+
+    this._rowsOnPage = viewPage.length;
     return new SuperTableStore(viewPage)
 
   }
@@ -504,6 +502,8 @@ class SuperTable extends React.Component {
     if (this.state.filterBy.length > 0) {
       // We have a filter.. use it.
       filterList = this._doFilter(this.state.filterBy);
+    } else {
+      this._currentRow = 0; // need to reset current row to 0
     }
 
     this.setState({
@@ -519,7 +519,8 @@ class SuperTable extends React.Component {
     // Just force redisplay.  Decrement start row by 2 * rowsperPage
     let rowsToReturn = this.state.rowsPerPage;
     let currentRow = this._currentRow;
-    currentRow = currentRow - (2 * rowsToReturn);
+    //currentRow = currentRow - (2 * rowsToReturn);
+    currentRow = currentRow - rowsToReturn - this._rowsOnPage;
     if (currentRow < 0) {
       currentRow = 0;
     }
@@ -539,6 +540,10 @@ class SuperTable extends React.Component {
   }
 
   _pageForward() {
+
+    if (this._currentRow === this.state.sortedDataList.getSize()) {
+      return;
+    }
     // Just force redisplay.  Start row will simply be incremented...
     this.setState({ redisplay: true });
   }
@@ -599,13 +604,19 @@ class SuperTable extends React.Component {
 
     var { sortedDataList, colSortDirs } = this.state;
     let filterState = { display: 'block', clear: 'both', float: 'left' };
+    let paginationShow = { display: 'block'};
 
     if (this.props.showFilter !== undefined && !this.props.showFilter) {
       filterState = { display: 'none' }
     }
 
+    if (this.props.showPagination !== undefined && !this.props.paginationShow) {
+      paginationShow = { display: 'none' }
+      
+    }
+
     var viewList = this._getPage(sortedDataList);
-    console.log('Rows per page: ' + this.state.rowsPerPage + ' viewlist size: ' + viewList.getSize());
+
     return (
       <div ref='superTable' >
 
@@ -661,47 +672,50 @@ class SuperTable extends React.Component {
               />
             })}
           </Table>
-
-          <div style={{ clear: 'both', float: 'left', width: this.state.tableWidth }}>
-            <div style={{ width: '33.3%', float: 'left' }}>{this.props.showText}
-              &nbsp;
+          <div style={paginationShow}>
+            <div style={{ clear: 'both', float: 'left', width: this.state.tableWidth }}>
+              <div style={{ width: '33.3%', float: 'left' }}>{this.props.showText}
+                &nbsp;
               <select value={this.state.rowsPerPage} onChange={(event) => this._onChangeRowsPerPage(event)}>
-                <option>10</option>
-                <option>20</option>
-                <option>50</option>
-                <option>100</option>
-              </select>
-              &nbsp;
+                  <option>10</option>
+                  <option>20</option>
+                  <option>50</option>
+                  <option>100</option>
+                </select>
+                &nbsp;
               {this.props.itemsPerPageText}
-            </div>
-            <div style={{ width: '33.3%', float: 'left', textAlign: 'center' }}>Page x of y</div>
-            <div style={{ width: '33.3%', float: 'left', textAlign: 'right' }}>
+              </div>
+              <div style={{ width: '33.3%', float: 'left', textAlign: 'center' }}>
+                Page {Math.ceil(this._currentRow / this.state.rowsPerPage)}
+                &nbsp;of&nbsp;
+              {Math.ceil(this.state.sortedDataList.getSize() / this.state.rowsPerPage)}</div>
+              <div style={{ width: '33.3%', float: 'left', textAlign: 'right' }}>
 
-              <i style={{ cursor: 'pointer', backgroundColor: '#d6e1f6' }} className='fa fa-chevron-right'
-                onClick={((event) => {
-                  this._pageFirst();
-                })}>
-              </i>
-              &nbsp;&nbsp;
+                <i style={{ cursor: 'pointer', backgroundColor: '#d6e1f6' }} className='fa fa-chevron-right'
+                  onClick={((event) => {
+                    this._pageFirst();
+                  })}>
+                </i>
+                &nbsp;&nbsp;
               <i style={{ cursor: 'pointer', padding: '4px' }} className='fa fa-chevron-left' onClick={((event) => {
-                this._pageBackward();
-              })}>
-              </i>
-              &nbsp;
-              <i style={{ cursor: 'pointer', backgroundColor: '#d6e1f6' }} className='fa fa-chevron-right'
-                onClick={((event) => {
-                  this._pageForward();
+                  this._pageBackward();
                 })}>
-              </i>
-              &nbsp;&nbsp;
+                </i>
+                &nbsp;
               <i style={{ cursor: 'pointer', backgroundColor: '#d6e1f6' }} className='fa fa-chevron-right'
-                onClick={((event) => {
-                  this._pageLast();
-                })}>
-              </i>
+                  onClick={((event) => {
+                    this._pageForward();
+                  })}>
+                </i>
+                &nbsp;&nbsp;
+              <i style={{ cursor: 'pointer', backgroundColor: '#d6e1f6' }} className='fa fa-chevron-right'
+                  onClick={((event) => {
+                    this._pageLast();
+                  })}>
+                </i>
+              </div>
             </div>
           </div>
-
         </div>
       </div>
     );
