@@ -76,9 +76,9 @@ ReactDOM.render(
             itemsPerPageText='items per page'
             onCellClickCallback={cellClick}
             onRowClickCallback={rowClick}
-            rowsPerPage={5}
+            rowsPerPage={10}
             showItemsPerPage={true}
-            showPagination={false}
+            showPagination={true}
             showTotalRowCount={true}
             tableHeight={500}
             tableWidth={'75%'}

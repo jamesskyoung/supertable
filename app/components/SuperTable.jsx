@@ -414,9 +414,7 @@ class SuperTable extends React.Component {
   _onChangeRowsPerPage(e) {
     let rowsToReturn = this.state.rowsPerPage;
     let currentRow = this._currentRow;
-    alert(this._currentRow);
     this._currentRow = this._currentRow - rowsToReturn;
-    alert(this._currentRow);
     localStorage.setItem("pmdb_rowsPerPage", parseInt(e.target.value));
     this.setState({ rowsPerPage: parseInt(e.target.value) });
 
@@ -428,7 +426,9 @@ class SuperTable extends React.Component {
    * @param {*} columnKey 
    */
   _onColumnResizeEndCallback(newColumnWidth, columnKey) {
-
+    let rowsToReturn = this.state.rowsPerPage;
+    let currentRow = this._currentRow;
+    this._currentRow = this._currentRow - rowsToReturn;
     this.setState(({ columnWidths }) => ({
       columnWidths: {
         ...columnWidths,
@@ -604,15 +604,15 @@ class SuperTable extends React.Component {
 
     var { sortedDataList, colSortDirs } = this.state;
     let filterState = { display: 'block', clear: 'both', float: 'left' };
-    let paginationShow = { display: 'block'};
+    let paginationShow = { display: 'block' };
 
     if (this.props.showFilter !== undefined && !this.props.showFilter) {
       filterState = { display: 'none' }
     }
 
-    if (this.props.showPagination !== undefined && !this.props.paginationShow) {
+    if (this.props.showPagination !== undefined && !this.props.showPagination) {
       paginationShow = { display: 'none' }
-      
+
     }
 
     var viewList = this._getPage(sortedDataList);
