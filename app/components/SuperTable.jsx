@@ -22,10 +22,9 @@ import _ from 'lodash';
 import FixedDataTable from 'fixed-data-table';
 import React from 'react';
 import ReactDOM from 'react-dom';
-
+import SuperTableStore from '../../app/SuperTableStore';
 
 require('../../node_modules/fixed-data-table/dist/fixed-data-table.css');
-import SuperTableStore from '../../app/SuperTableStore';
 
 const { Table, Column, Cell } = FixedDataTable;
 
@@ -167,8 +166,14 @@ class SuperTable extends React.Component {
     // Get rows per page from local storage... if null, use props
     let rowsPerPage = localStorage.getItem("pmdb_rowsPerPage");
 
-    if ( rowsPerPage == null ) {
+    if (rowsPerPage == null) {
       rowsPerPage = this.props.rowsPerPage === undefined ? 0 : this.props.rowsPerPage;
+    }
+
+    // But only use rowsPerPage IF showPagination is true
+    let showPagination = this.props.showPagination === undefined ? false : this.props.showPagination;
+    if (!showPagination) {
+      rowsPerPage = 0;
     }
 
     this.state = {
@@ -176,12 +181,15 @@ class SuperTable extends React.Component {
       colSortDirs: {},
       dataAttrNames: [],
       filterBy: '',
-      rowsPerPage: rowsPerPage,
+      rowsPerPage: parseInt(rowsPerPage),
+      shouldRender: false,
+      showPagination: showPagination,
       sortedDataList: this._dataList,
       startPageRow: 0,
       tableWidth: 0
     };
 
+    this._currentRow = 0;  // Used for paging...
     this._tableHeight = this.props.tableHeight,
       this._visibleRows = size;
     this._onSortChange = this._onSortChange.bind(this);
@@ -238,9 +246,9 @@ class SuperTable extends React.Component {
     });
 
     if (tableInPercentage) {
-      this.setState({ tableWidth: tableWidthPixels, columnWidths: columnWidths });
+      this.setState({ shouldRender: true, tableWidth: tableWidthPixels, columnWidths: columnWidths });
     } else {
-      this.setState({ columnWidths: columnWidths });
+      this.setState({ shouldRender: true, columnWidths: columnWidths });
     }
 
   }
@@ -305,6 +313,7 @@ class SuperTable extends React.Component {
 
     // Store
     this._visibleRows = size;
+    this._currentRow = 0; // need ot reset current row to 0
     return newDataList;
 
   }
@@ -328,21 +337,34 @@ class SuperTable extends React.Component {
    * Return a page of data..
    */
   _getPage(sortedDataList) {
-    console.log('Sorteddata list length is: ' + sortedDataList.getSize());
+
     if (0 === this.state.rowsPerPage) {
       return sortedDataList;
     }
-    
+
     let rowsToReturn = this.state.rowsPerPage;
     if (rowsToReturn > sortedDataList.getSize()) {
       rowsToReturn = sortedDataList.getSize();
     }
-    let viewPage = []
-    for (var index = 0; index < rowsToReturn; index++) {
-      var dataObj = sortedDataList.getObjectAt(index);
-      viewPage.push(dataObj)
+
+    let viewPage = [];
+    let currentRow = this._currentRow;
+    let endRow = currentRow + rowsToReturn;
+
+    for (currentRow; currentRow < endRow; currentRow++) {
+      console.log('CurrentRow: ' + currentRow + ' SortedDL: ' + sortedDataList.getSize());
+      var dataObj = sortedDataList.getObjectAt(currentRow);
+      viewPage.push(dataObj);
+      if (currentRow === sortedDataList.getSize()) {
+        console.log('reached the end!..');
+        break;
+      }
     }
 
+    if (this.state.shouldRender) {
+      // Only update if we can show the table...
+      this._currentRow = currentRow;
+    }
     return new SuperTableStore(viewPage)
 
   }
@@ -387,14 +409,18 @@ class SuperTable extends React.Component {
   }
 
   /**
-   * Change numbe rof rows per page to be viewed.
+   * Change numbe rof rows per page to be viewed.  Refresh the page which is why
+   * we substract frm current row -- which is always pointing to the NEXT page
    * @param {*} e 
    */
   _onChangeRowsPerPage(e) {
-    
-    localStorage.setItem("pmdb_rowsPerPage", parseInt( e.target.value ) );
-    this.setState( { rowsPerPage: parseInt( e.target.value )});
-
+    let rowsToReturn = this.state.rowsPerPage;
+    let currentRow = this._currentRow;
+    alert(this._currentRow);
+    this._currentRow = this._currentRow - rowsToReturn;
+    alert(this._currentRow);
+    localStorage.setItem("pmdb_rowsPerPage", parseInt(e.target.value));
+    this.setState({ rowsPerPage: parseInt(e.target.value) });
 
   }
 
@@ -488,6 +514,35 @@ class SuperTable extends React.Component {
     });
   }
 
+  _pageBackward() {
+
+    // Just force redisplay.  Decrement start row by 2 * rowsperPage
+    let rowsToReturn = this.state.rowsPerPage;
+    let currentRow = this._currentRow;
+    currentRow = currentRow - (2 * rowsToReturn);
+    if (currentRow < 0) {
+      currentRow = 0;
+    }
+    this._currentRow = currentRow;
+    this.setState({ redisplay: true });
+
+  }
+
+  _pageEnd() {
+
+  }
+
+  _pageFirst() {
+
+    this._currentRow = 0;
+    this.setState({ redisplay: true });
+  }
+
+  _pageForward() {
+    // Just force redisplay.  Start row will simply be incremented...
+    this.setState({ redisplay: true });
+  }
+
   /**
     * 
     * @param {*} dataAttrNames 
@@ -533,8 +588,6 @@ class SuperTable extends React.Component {
 
   }
 
-
-
   /**
    * REACT Render method.
    */
@@ -552,16 +605,16 @@ class SuperTable extends React.Component {
     }
 
     var viewList = this._getPage(sortedDataList);
-    //viewList = sortedDataList;
-    // calculate widths
-    // table width an dindividual cell widths (if not provided.)
+    console.log('Rows per page: ' + this.state.rowsPerPage + ' viewlist size: ' + viewList.getSize());
     return (
       <div ref='superTable' >
+
         <div style={{ width: this.state.tableWidth }}>
           <div style={filterState}>
             <input
               onChange={this._onFilterChange.bind(this)}
               placeholder={this.props.filterPlaceholder} />
+
           </div>
           <div style={{ float: 'right' }}>
             {sortedDataList.getSize()} {this.props.totalRowCountText}
@@ -608,11 +661,11 @@ class SuperTable extends React.Component {
               />
             })}
           </Table>
-          <h1>After table</h1>
+
           <div style={{ clear: 'both', float: 'left', width: this.state.tableWidth }}>
             <div style={{ width: '33.3%', float: 'left' }}>{this.props.showText}
               &nbsp;
-              <select value={this.state.rowsPerPage} onChange={( event) => this._onChangeRowsPerPage( event )}>
+              <select value={this.state.rowsPerPage} onChange={(event) => this._onChangeRowsPerPage(event)}>
                 <option>10</option>
                 <option>20</option>
                 <option>50</option>
@@ -622,7 +675,31 @@ class SuperTable extends React.Component {
               {this.props.itemsPerPageText}
             </div>
             <div style={{ width: '33.3%', float: 'left', textAlign: 'center' }}>Page x of y</div>
-            <div style={{ width: '33.3%', float: 'left', textAlign: 'right' }}>Chevrons...</div>
+            <div style={{ width: '33.3%', float: 'left', textAlign: 'right' }}>
+
+              <i style={{ cursor: 'pointer', backgroundColor: '#d6e1f6' }} className='fa fa-chevron-right'
+                onClick={((event) => {
+                  this._pageFirst();
+                })}>
+              </i>
+              &nbsp;&nbsp;
+              <i style={{ cursor: 'pointer', padding: '4px' }} className='fa fa-chevron-left' onClick={((event) => {
+                this._pageBackward();
+              })}>
+              </i>
+              &nbsp;
+              <i style={{ cursor: 'pointer', backgroundColor: '#d6e1f6' }} className='fa fa-chevron-right'
+                onClick={((event) => {
+                  this._pageForward();
+                })}>
+              </i>
+              &nbsp;&nbsp;
+              <i style={{ cursor: 'pointer', backgroundColor: '#d6e1f6' }} className='fa fa-chevron-right'
+                onClick={((event) => {
+                  this._pageLast();
+                })}>
+              </i>
+            </div>
           </div>
 
         </div>
