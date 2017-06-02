@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import SuperTable from './components/SuperTable.jsx';
+import SuperTable from '../lib/SuperTable.jsx';
 
 
 let data = [];
