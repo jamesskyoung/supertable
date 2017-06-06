@@ -25,7 +25,7 @@ docs/html
 .DS_Store
 
 build/
-lib/
+
 dist/
 storybook-static/
 
