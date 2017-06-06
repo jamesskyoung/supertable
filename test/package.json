@@ -2,7 +2,6 @@
   "name": "ReactSuperTable",
   "version": "0.0.1",
   "description": "",
-  "main": "server.js",
   "scripts": {
     "build": "webpack -p --config webpack.config.js",
     "nodemon": "nodemon --verbose server.js",
@@ -22,7 +21,7 @@
     "react": "^15.4.0",
     "react-bootstrap": "^0.31.0",
     "react-dom": "^15.4.0",
-    "reactsupertable": "0.0.2",
+    "reactsupertable": "0.0.3",
     "style-loader": "^0.13.2",
     "webpack": "^2.5.1",
     "webpack-dev-middleware": "^1.10.2",
