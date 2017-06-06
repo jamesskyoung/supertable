@@ -1,7 +1,7 @@
 var path = require( 'path' );
 
 var config = {
-   entry: './app/app.jsx',
+   entry: './app.jsx',
 
 	
    output: {
@@ -31,12 +31,7 @@ var config = {
             query: {
                presets: ['es2015', 'react']
             }
-         },
-         {
-                test: /\.css$/,
-                include: /node_modules/,
-                loader:  'style-loader!css-loader'
-            }
+         }
       ]
    }
 }

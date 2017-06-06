@@ -36,11 +36,6 @@ var config = {
                 test: /\.css$/,
                 include: /node_modules/,
                 loader: 'style-loader!css-loader'
-            },
-            {
-                test: /\.css$/,
-                include: /./,
-                loader: 'style-loader!css-loader'
             }
         ]
     }

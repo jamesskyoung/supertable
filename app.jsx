@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-//import SuperTable from './lib/SuperTable.jsx';
-import SuperTable from 'reactsupertable';
+import SuperTable from './lib/SuperTable.jsx';
+
 
 
 let data = [];
