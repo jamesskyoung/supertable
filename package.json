@@ -7,7 +7,6 @@
     "build": "webpack -p --config webpack.config.js",
     "nodemon": "nodemon --verbose server.js",
     "start": "node server.js",
-    "test": "jest --config jest.config.js",
     "wp": "webpack-dev-server --hot --inline"
   },
   "author": "James Young",

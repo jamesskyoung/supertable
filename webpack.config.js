@@ -5,9 +5,9 @@ var config = {
 
 
     output: {
-        path: path.join(__dirname, "./output/dist/js"),
+        path: path.join(__dirname, "./dist"),
 
-        filename: 'bundle.js',
+        filename: 'react-supertable.js',
     },
 
     devServer: {
