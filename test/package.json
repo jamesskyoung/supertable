@@ -21,7 +21,7 @@
     "react": "^15.4.0",
     "react-bootstrap": "^0.31.0",
     "react-dom": "^15.4.0",
-    "reactsupertable": "0.0.3",
+    "reactsupertable": "0.0.4",
     "style-loader": "^0.13.2",
     "webpack": "^2.5.1",
     "webpack-dev-middleware": "^1.10.2",
