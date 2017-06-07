@@ -19,7 +19,7 @@ import DropdownButton from 'react-bootstrap/lib/DropdownButton';
 import MenuItem from 'react-bootstrap/lib/MenuItem';
 import SuperTableStore from './SuperTableStore';
 
-require('./fixed-data-table.css');
+//require('./fixed-data-table.css');
 
 const { Table, Column, Cell } = FixedDataTable;
 
