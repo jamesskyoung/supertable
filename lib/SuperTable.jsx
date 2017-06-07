@@ -817,3 +817,4 @@ class SuperTable extends React.Component {
 }
 
 export default SuperTable;
+module.exports = SuperTable;
