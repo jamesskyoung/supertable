@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import SuperTable from './lib/SuperTable.jsx';
 
 
-
+alert( 'xxx' );
 let data = [];
 let dataSize = 105;
 let xswitch = true;
