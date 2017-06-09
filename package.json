@@ -1,13 +1,9 @@
 {
   "name": "reactsupertable",
-  "version": "0.0.5",
-  "description": "",
-  "main": "server.js",
+  "version": "0.0.15",
+  "description": "FLexible dat atable based on Facebook's fixed-data-table",
   "scripts": {
-    "build": "webpack -p --config webpack.config.js",
-    "nodemon": "nodemon --verbose server.js",
-    "start": "node server.js",
-    "test": "jest --config jest.config.js",
+    "build": "webpack -p --config webpack.config.build.js",
     "wp": "webpack-dev-server --hot --inline"
   },
   "author": "James Young",
@@ -15,13 +11,11 @@
   "dependencies": {
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "css-loader": "^0.26.4",
-    "express": "^4.14.0",
-    "faker": "^4.1.0",
     "fixed-data-table": "^0.6.4",
     "nodemon": "^1.11.0",
     "react": "^15.4.0",
     "react-bootstrap": "^0.31.0",
-    "react-dom": "^15.4.0",
+    "react-dom": "^15.5.4",
     "style-loader": "^0.13.2",
     "webpack": "^2.5.1",
     "webpack-dev-middleware": "^1.10.2",
