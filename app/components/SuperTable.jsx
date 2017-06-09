@@ -618,7 +618,7 @@ class SuperTable extends React.Component {
     var viewList = this._getPage(sortedDataList);
 
     return (
-      <div ref='superTable' >
+      <div >
 
         <div style={{ width: this.state.tableWidth }}>
           <div style={filterState}>
