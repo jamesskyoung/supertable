@@ -1,12 +1,13 @@
 var path = require('path');
 
 var config = {
-    entry: './index.js',
+    entry: './lib/SuperTable.jsx',
 
 
     output: {
-        path: path.join(__dirname, "./dist/js"),
+        path: path.join(__dirname, "./dist"),
         filename: 'reactsupertable.js',
+         libraryTarget: 'umd'
 
     },
 
