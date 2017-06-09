@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import SuperTable from './lib/SuperTable.jsx';
+//import SuperTable from './lib/SuperTable.jsx';
+import SuperTable from './lib';
 
-
-alert( 'xxx' );
+alert( 'aaabbb' );
 console.log( '*****************************' );
 console.log( SuperTable );
 console.log( '*****************************' );
