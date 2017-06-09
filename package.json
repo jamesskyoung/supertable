@@ -1,10 +1,6 @@
 {
   "name": "reactsupertable",
-<<<<<<< HEAD
-  "version": "0.0.16",
-=======
   "version": "0.0.22",
->>>>>>> 8813a7dd397485fede7da138e3c31e73ffe3b671
   "description": "FLexible dat atable based on Facebook's fixed-data-table",
   "scripts": {
     "build": "webpack -p --config webpack.config.js",
@@ -14,11 +10,12 @@
   "author": "James Young",
   "license": "MIT",
   "dependencies": {
-    "babel-plugin-transform-object-rest-spread": "^6.23.0"
-    
+   
     
   },
   "devDependencies": {
+     "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    
     "css-loader": "^0.26.4",
     "fixed-data-table": "^0.6.4",
     "nodemon": "^1.11.0",
