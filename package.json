@@ -1,6 +1,6 @@
 {
   "name": "reactsupertable",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "description": "FLexible dat atable based on Facebook's fixed-data-table",
   "scripts": {
     "build": "webpack -p --config webpack.config.js",
@@ -14,7 +14,6 @@
     "css-loader": "^0.26.4",
     "fixed-data-table": "^0.6.4",
     "nodemon": "^1.11.0",
-   
     "style-loader": "^0.13.2",
     "webpack": "^2.5.1",
     "webpack-dev-middleware": "^1.10.2",
@@ -37,7 +36,7 @@
     "react-addons-test-utils": "^15.4.1",
     "react-hot-loader": "^1.3.1",
     "react-test-renderer": "^15.4.1",
-     "react": "^15.4.0",
+    "react": "^15.4.0",
     "react-bootstrap": "^0.31.0",
     "react-dom": "^15.5.4",
     "sass-loader": "^4.0.2",
