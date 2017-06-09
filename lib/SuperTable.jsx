@@ -683,7 +683,7 @@ class SuperTable extends React.Component {
     let rowsPerPage = [10, 20, 50, 100];
 
     return (
-      <div style={{ width: '100%' }}  >
+      <div style={{ width: '100%' }} ref='superTable'  >
 
         <div style={{ width: this.state.tableWidth }}>
 
