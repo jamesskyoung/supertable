@@ -1,11 +1,12 @@
 {
   "name": "reactsupertable",
-  "version": "0.0.18",
+  "version": "0.0.17",
   "description": "FLexible dat atable based on Facebook's fixed-data-table",
   "scripts": {
     "build": "webpack -p --config webpack.config.js",
     "wp": "webpack-dev-server --hot --inline"
   },
+  "main": "./dist/reactsupertable.js",
   "author": "James Young",
   "license": "MIT",
   "dependencies": {
