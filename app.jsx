@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-//import SuperTable from './lib/SuperTable.jsx';
-import SuperTable from './lib';
+import SuperTable from './lib/SuperTable.jsx';
 
 alert( 'aaabbb' );
 console.log( '*****************************' );
