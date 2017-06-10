@@ -1,6 +1,6 @@
 {
   "name": "reactsupertable",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Flexible REACT data table based on Facebook's fixed-data-table",
   "scripts": {
     "build": "webpack -p --config webpack.config.build.js",
