@@ -1,14 +1,14 @@
 var path = require('path');
 
 var config = {
-    entry: './lib/SuperTable.jsx',
+    entry: './app.jsx',
 
 
     output: {
+
         path: path.join(__dirname, "./dist"),
         filename: 'reactsupertable.js',
-         libraryTarget: 'umd'
-
+        libraryTarget: 'umd'
     },
 
     devServer: {
@@ -21,7 +21,6 @@ var config = {
         },
         port: 9080
     },
-
     module: {
         loaders: [
             {

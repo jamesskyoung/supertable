@@ -5,9 +5,10 @@ var config = {
 
 
     output: {
-        path: path.join(__dirname, "./dist/js"),
-        filename: 'reactsupertable.js',
 
+        path: path.join(__dirname, "./dist"),
+        filename: 'reactsupertable.js',
+        libraryTarget: 'umd'
     },
 
     devServer: {
@@ -21,6 +22,21 @@ var config = {
         port: 9080
     },
 
+    externals: [{
+        'react': {
+            root: 'React',
+            commonjs2: 'react',
+            commonjs: 'react',
+            amd: 'react'
+        }
+    }, {
+        'react-dom': {
+            root: 'ReactDOM',
+            commonjs2: 'react-dom',
+            commonjs: 'react-dom',
+            amd: 'react-dom'
+        }
+    }],
     module: {
         loaders: [
             {
