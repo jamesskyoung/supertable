@@ -2,51 +2,46 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import SuperTable from './lib/SuperTable.jsx';
 
-alert( 'aaabbb' );
-console.log( '*****************************' );
-console.log( SuperTable );
-console.log( '*****************************' );
+let faker = require('faker');
+
 let data = [];
-let dataSize = 105;
+let dataSize = 10;
 let xswitch = true;
 
+
+// Create data using faker
 for (var i = 0; i < dataSize; i++) {
-    let pl = '3rd party';
-    if ( xswitch) {
-        pl = '1st Party';
-        xswitch = false;
-    } else {
-        xswitch = true;
-    }
-    var obj = {
-        id: i + Math.random(),
-        partnerName: 'name_' + i,
-        partnerStatus: 'active',
-        partnerCity: 'London_' + Math.random(),
-        partnerLevel: pl,
-        created: new Date().getTime()
-    }
-    data.push(obj);
+    data.push( createFakeRowObjectData( i ) );
 }
 
+function createFakeRowObjectData(/*number*/ index) /*object*/ {
+    return {
+      id: index,
+      avatar: faker.image.avatar(),
+      city: faker.address.city(),
+      email: faker.internet.email(),
+      firstName: faker.name.firstName(),
+      lastName: faker.name.lastName(),
+      street: faker.address.streetName(),
+      zipCode: faker.address.zipCode(),
+      date: faker.date.past(),
+      bs: faker.company.bs(),
+      catchPhrase: faker.company.catchPhrase(),
+      companyName: faker.company.companyName(),
+      words: faker.lorem.words(),
+      sentence: faker.lorem.sentence(),
+    };
+  }
+
 function getColumnMetaData() {
-/*
-    return [
-        { 'header': 'ID', 'width': 300, attribute: 'id', order: 1 },
-        { 'header': 'Partner Status', 'width': 200, attribute: 'partnerStatus', order: 2 },
-        { 'header': 'City', 'width': 200, attribute: 'partnerCity', order: 3 },
-        { 'header': 'Level', 'width': 200, attribute: 'partnerLevel', order: 4 },
-        { 'header': 'Created', 'width': 200, attribute: 'created', order: 5 }
 
-    ]
-*/
     return [
-        { 'header': 'ID', 'width': '5%', attribute: 'id', order: 1 },
-        { 'header': 'Partner Status', 'width': '20%', attribute: 'partnerStatus', order: 2 },
-        { 'header': 'City', 'width': '45%', attribute: 'partnerCity', order: 3, resize: true, xrenderer: customRender },
-        { 'header': 'Level', 'width': '20%', attribute: 'partnerLevel', order: 4, maxWidth: 222 },
-        { 'header': 'Created', 'width': '10%', attribute: 'created', order: 5 }
-
+        { 'header': 'ID', 'width': '10%', attribute: 'id', order: 1 },
+        { 'header': 'Email', 'width': '20%', attribute: 'email', order: 4, maxWidth: 222 },
+        { 'header': 'City', 'width': '30%', attribute: 'city', order: 3, resize: true, xrenderer: customRender },
+        { 'header': 'Street', 'width': '20%', attribute: 'street', order: 4, maxWidth: 222 },
+        { 'header': 'Zip', 'width': '10%', attribute: 'zipCode', order: 5 },
+        { 'header': 'Date', 'width': '10%', attribute: 'date', order: 4, renderer: dateRender },
     ]
 
 }
@@ -60,11 +55,34 @@ function cellClick( rowIndex, column, data ) {
     alert( 'Cell clicked! attribute name : ' + column + ' Id is: ' + data['id'] );
 }
 
+/**
+ * Render a date object
+ * @param {*} rowIndex 
+ * @param {*} data 
+ * @param {*} columnKey 
+ */
+function dateRender( rowIndex, data, columnKey ) {
+  function pad(number) {
+      if (number < 10) {
+        return '0' + number;
+      }
+      return number;
+    }
+
+  function formatDate( date ){
+      return date.getUTCFullYear() +
+        '/' + pad(date.getUTCMonth() + 1) +
+        '/' + pad(date.getUTCDate());
+        
+    };
+    return formatDate( data[columnKey] );
+ 
+}
+
 function customRender( rowIndex, data, columnKey ) {
   
     return 'custom...' + data[columnKey] + '...end'
-
-  
+ 
 }
 
 
@@ -84,7 +102,7 @@ ReactDOM.render(
             showText={'Show'}
             showTotalRowCount={true}
             tableHeight={500}
-            tableWidth={'75%'}
+            tableWidth={'100%'}
             totalRowCountText='items found'
         />
     </div>,

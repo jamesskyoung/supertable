@@ -2,6 +2,13 @@
   "name": "reactsupertable",
   "version": "0.1.1",
   "description": "Flexible REACT data table based on Facebook's fixed-data-table",
+  "keywords": [
+    "react",
+    "datatable",
+    "fixed-data-table",
+    "data-table",
+    "reactjs"
+  ],
   "scripts": {
     "build": "webpack -p --config webpack.config.build.js",
     "start": "webpack-dev-server --hot --inline"
@@ -9,7 +16,9 @@
   "main": "./dist/reactsupertable.js",
   "author": "James Young",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "faker": "^4.1.0"
+  },
   "devDependencies": {
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "css-loader": "^0.26.4",
