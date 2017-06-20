@@ -88,11 +88,11 @@ function customRender( rowIndex, data, columnKey ) {
 
 ReactDOM.render(
     <div>
-        <h1>PMDB Datatable!</h1>
+        <h1>React SuperTable</h1>
         <SuperTable 
             columnMeta={ getColumnMetaData() }
             data={data}
-            filterPlaceholder='Filter this data..yyy.'
+            filterPlaceholder='Filter...'
             itemsPerPageText='items per page'
             onCellClickCallback={cellClick}
             onRowClickCallback={rowClick}
