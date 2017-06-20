@@ -1,6 +1,6 @@
 {
   "name": "reactsupertable",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Flexible REACT data table based on Facebook's fixed-data-table",
   "keywords": [
     "react",
@@ -16,7 +16,7 @@
   "main": "./dist/reactsupertable.js",
   "author": "James Young",
   "license": "MIT",
-  "dependencies": { },
+  "dependencies": {},
   "devDependencies": {
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "css-loader": "^0.26.4",
