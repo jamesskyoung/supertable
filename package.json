@@ -1,7 +1,14 @@
 {
   "name": "reactsupertable",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Flexible REACT data table based on Facebook's fixed-data-table",
+  "keywords": [
+    "react",
+    "datatable",
+    "fixed-data-table",
+    "data-table",
+    "reactjs"
+  ],
   "scripts": {
     "build": "webpack -p --config webpack.config.build.js",
     "start": "webpack-dev-server --hot --inline"
@@ -13,6 +20,7 @@
   "devDependencies": {
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "css-loader": "^0.26.4",
+    "faker": "^4.1.0",
     "fixed-data-table": "^0.6.4",
     "nodemon": "^1.11.0",
     "style-loader": "^0.13.1",

@@ -271,13 +271,18 @@ class SuperTable extends React.Component {
     for (var index = 0; index < size; index++) {
 
       var dataObj = this._dataList.getObjectAt(index);
+      
       for (var columnIndex = 0; columnIndex < this._columnMeta.length; columnIndex++) {
         var col = this._columnMeta[columnIndex];
         let value = dataObj[col.attribute];
+        if ( _.isObject( value ) ) {
+          value = value.toString();
+        }
+      
         if (_.isNumber(value)) {
           value = value.toString();
         }
-
+       
         if (value.toLowerCase().indexOf(filterBy) !== -1) {
           filteredData.push(dataObj);
           break;
