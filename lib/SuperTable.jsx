@@ -90,12 +90,13 @@ class CustomCell extends React.Component {
   render() {
     let props = this.props;
     this._name = this.props.name;
+    this._columnName = this.props.columnName;
     this._cellData = this.props.data.getObjectAt(this.props.rowIndex)[this.props.columnKey];
     this._data = this.props.data.getObjectAt(this.props.rowIndex);
-
+   
     return (
       <Cell {...props} onClick={this.clickEventHandler.bind(this)}>
-        {this.props.renderer(this.props.rowIndex, this._data, this.props.columnKey)}
+        {this.props.renderer(this.props.rowIndex, this._data, this._columnName)}
       </Cell>
     )
   }
@@ -382,6 +383,10 @@ class SuperTable extends React.Component {
 
     let columnWidths = {};
     this._columnMeta.map((colObj, index) => {
+      if ( undefined === colObj.attribute ) {
+        console.log( 'No attribute.. must be special column... use header as attribute name' );
+        colObj.attribute = colObj.header;
+      }
       columnWidths[colObj.attribute] = colObj.width;
 
     });
@@ -719,7 +724,7 @@ class SuperTable extends React.Component {
             {this._columnMeta.map((col, index) => {
               let renderer = <TextCell onClick={this._onCellClick.bind(this)} data={viewList} name={col.attribute} />
               if (undefined !== col.renderer) {
-                renderer = <CustomCell renderer={col.renderer} onClick={this._onCellClick.bind(this)} data={viewList} name={col.attribute} />
+                renderer = <CustomCell columnName={col.header} renderer={col.renderer} onClick={this._onCellClick.bind(this)} data={viewList} name={col.attribute} />
               }
 
               return <Column
