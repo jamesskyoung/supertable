@@ -275,6 +275,10 @@ class SuperTable extends React.Component {
       for (var columnIndex = 0; columnIndex < this._columnMeta.length; columnIndex++) {
         var col = this._columnMeta[columnIndex];
         let value = dataObj[col.attribute];
+        if ( undefined === value ) {
+          continue;
+        }
+
         if ( _.isObject( value ) ) {
           value = value.toString();
         }
@@ -347,7 +351,7 @@ class SuperTable extends React.Component {
 
     if (this.state.shouldRender) {
       // Only update if we can show the table...
-      this._currentRow = currentRow;
+      //this._currentRow = currentRow;
     }
 
     this._rowsOnPage = viewPage.length;
@@ -580,7 +584,7 @@ class SuperTable extends React.Component {
     let rowsToReturn = this.state.rowsPerPage;
     let currentRow = this._currentRow;
     //currentRow = currentRow - (2 * rowsToReturn);
-    currentRow = currentRow - rowsToReturn - this._rowsOnPage;
+    currentRow = currentRow - rowsToReturn;// - this._rowsOnPage;
     if (currentRow < 0) {
       currentRow = 0;
     }
@@ -601,6 +605,7 @@ class SuperTable extends React.Component {
       return;
     }
     // Just force redisplay.  Start row will simply be incremented...
+    this._currentRow += this.state.rowsPerPage;
     this.setState({ redisplay: true });
   }
 

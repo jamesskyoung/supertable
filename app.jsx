@@ -36,12 +36,12 @@ function createFakeRowObjectData(/*number*/ index) /*object*/ {
 function getColumnMetaData() {
 
     return [
+        { 'header': 'Special', 'width': '10%', renderer: insertCheckbox, order: 1 },
         { 'header': 'ID', 'width': '10%', attribute: 'id', order: 1 },
         { 'header': 'Email', 'width': '20%', attribute: 'email', order: 4, maxWidth: 222 },
-        { 'header': 'City', 'width': '30%', attribute: 'city', order: 3, resize: true, xrenderer: customRender },
+        { 'header': 'City', 'width': '20%', attribute: 'city', order: 3, resize: true, xrenderer: customRender },
         { 'header': 'Street', 'width': '20%', attribute: 'street', order: 4, maxWidth: 222 },
-        { 'header': 'Zip', 'width': '10%', attribute: 'zipCode', order: 5 },
-        { 'header': 'Date', 'width': '10%', attribute: 'date', order: 4, renderer: dateRender },
+        { 'header': 'Zip', 'width': '20%', attribute: 'zipCode', order: 5 }
     ]
 
 }
