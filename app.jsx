@@ -5,7 +5,7 @@ import SuperTable from './lib/SuperTable.jsx';
 let faker = require('faker');
 
 let data = [];
-let dataSize = 10;
+let dataSize = 960;
 let xswitch = true;
 
 

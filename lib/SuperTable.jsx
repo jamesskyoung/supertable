@@ -220,7 +220,7 @@ class SuperTable extends React.Component {
   /**
    * 
    */
-  _init() {
+  _init( data ) {
 
     if ( undefined === data ) {
       this._dataList = new SuperTableStore(this.props.data);
@@ -623,8 +623,8 @@ class SuperTable extends React.Component {
   }
 
   _pageForward() {
-
-    if (this._currentRow === this.state.sortedDataList.getSize()) {
+//alert( (this._currentRow + this.state.rowsPerPage ) + ' ' + this.state.sortedDataList.getSize() );
+    if (this._currentRow + this.state.rowsPerPage >= this.state.sortedDataList.getSize()) {
       return;
     }
     // Just force redisplay.  Start row will simply be incremented...
@@ -806,7 +806,7 @@ class SuperTable extends React.Component {
               </div>
 
               <div style={{ width: '33.3%', float: 'left', textAlign: 'center', lineHeight: '32px' }}>
-                Page {Math.ceil(this._currentRow / this.state.rowsPerPage)}
+                Page {Math.ceil(this._currentRow / this.state.rowsPerPage) + 1 }
                 &nbsp;of&nbsp;
               {Math.ceil(this.state.sortedDataList.getSize() / this.state.rowsPerPage)}
               </div>
