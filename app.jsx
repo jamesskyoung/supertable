@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import SuperTable from './lib/SuperTable.jsx';
+import Button from 'react-bootstrap/lib/Button';
 
 let faker = require('faker');
 
@@ -32,6 +33,18 @@ function createFakeRowObjectData(/*number*/ index) /*object*/ {
       sentence: faker.lorem.sentence(),
     };
   }
+
+function refreshData() {
+    
+    dataSize=87;
+    data = [];
+    for (var i = 0; i < dataSize; i++) {
+        data.push( createFakeRowObjectData( i ) );
+    }
+    if (undefined !== window.superTable) {
+        window.superTable.refresh(data);
+      }
+}
 
 function getColumnMetaData() {
 
@@ -98,17 +111,13 @@ function customRender( rowIndex, data, columnKey ) {
  
 }
 
-function refresh() {
-    if (undefined !== this.superTable) {
-        this.superTable.refresh(users);
-      }
-}
+
 
 ReactDOM.render(
     <div>
         <h1>React SuperTable</h1>
         <SuperTable 
-            ref={instance => { this.superTable = instance; }}
+            ref={instance => { window.superTable = instance; }}
             columnMeta={ getColumnMetaData() }
             data={data}
             filterPlaceholder='Filter...'
@@ -124,6 +133,7 @@ ReactDOM.render(
             tableWidth={'100%'}
             totalRowCountText='items found'
         />
+        <Button onClick={refreshData}>New Data!</Button>
     </div>,
     document.getElementById('app')
 );
