@@ -98,11 +98,17 @@ function customRender( rowIndex, data, columnKey ) {
  
 }
 
+function refresh() {
+    if (undefined !== this.superTable) {
+        this.superTable.refresh(users);
+      }
+}
 
 ReactDOM.render(
     <div>
         <h1>React SuperTable</h1>
         <SuperTable 
+            ref={instance => { this.superTable = instance; }}
             columnMeta={ getColumnMetaData() }
             data={data}
             filterPlaceholder='Filter...'

@@ -200,12 +200,35 @@ class SuperTable extends React.Component {
     this._onColumnResizeEndCallback = this._onColumnResizeEndCallback.bind(this);
   }
 
+   /**
+   * Refresh data.  We need to reload a few things...
+   * 
+   * @param {*} data 
+   */
+  refresh(data) {
+   
+    this._init( data );
+    this._setWidths();
+    this._processTableProperties();
+    this.setState({
+      sortedDataList: this._dataList
+    });
+    
+  }
+
+
   /**
    * 
    */
   _init() {
+
+    if ( undefined === data ) {
+      this._dataList = new SuperTableStore(this.props.data);
+    } else {
+      this._dataList = new SuperTableStore( data );
+   
+    }
   
-    this._dataList = new SuperTableStore(this.props.data);
     this._columnMeta = this.props.columnMeta || null;
     this._defaultSortIndexes = [];
   }
