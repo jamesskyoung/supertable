@@ -18,6 +18,7 @@ import ReactDOM from 'react-dom';
 import DropdownButton from 'react-bootstrap/lib/DropdownButton';
 import MenuItem from 'react-bootstrap/lib/MenuItem';
 import SuperTableStore from './SuperTableStore';
+import SuperTablePaginator from './SuperTablePaginator.jsx';
 
 //require('./fixed-data-table.css');
 
@@ -93,7 +94,7 @@ class CustomCell extends React.Component {
     this._columnName = this.props.columnName;
     this._cellData = this.props.data.getObjectAt(this.props.rowIndex)[this.props.columnKey];
     this._data = this.props.data.getObjectAt(this.props.rowIndex);
-   
+
     return (
       <Cell {...props} onClick={this.clickEventHandler.bind(this)}>
         {this.props.renderer(this.props.rowIndex, this._data, this._columnName)}
@@ -195,40 +196,40 @@ class SuperTable extends React.Component {
 
     this._currentRow = 0;  // Used for paging...
     this._tableHeight = this.props.tableHeight,
-    this._visibleRows = size;
+      this._visibleRows = size;
     this._onSortChange = this._onSortChange.bind(this);
     this._onColumnResizeEndCallback = this._onColumnResizeEndCallback.bind(this);
   }
 
-   /**
-   * Refresh data.  We need to reload a few things...
-   * 
-   * @param {*} data 
-   */
+  /**
+  * Refresh data.  We need to reload a few things...
+  * 
+  * @param {*} data 
+  */
   refresh(data) {
-   
-    this._init( data );
+
+    this._init(data);
     this._setWidths();
     this._processTableProperties();
     this.setState({
       sortedDataList: this._dataList
     });
-    
+
   }
 
 
   /**
    * 
    */
-  _init( data ) {
+  _init(data) {
 
-    if ( undefined === data ) {
+    if (undefined === data) {
       this._dataList = new SuperTableStore(this.props.data);
     } else {
-      this._dataList = new SuperTableStore( data );
-   
+      this._dataList = new SuperTableStore(data);
+
     }
-  
+
     this._columnMeta = this.props.columnMeta || null;
     this._defaultSortIndexes = [];
   }
@@ -247,7 +248,7 @@ class SuperTable extends React.Component {
    * 
    */
   componentDidMount() {
-   
+
     this._processTableProperties();
   }
 
@@ -257,8 +258,8 @@ class SuperTable extends React.Component {
    * an init function etc.
    */
   componentWillMount() {
-    console.log( 'copmon will mount..' );
-    console.log( this.props.data );
+    console.log('copmon will mount..');
+    console.log(this.props.data);
     // get all attribute names from the data..
     let dataAttrNames = this._getDataAttributes(this.props.data[0]);
 
@@ -275,7 +276,7 @@ class SuperTable extends React.Component {
   }
 
   shouldComponentUpdate() {
-   
+
     return this._processTableProperties();
   }
 
@@ -294,22 +295,22 @@ class SuperTable extends React.Component {
     for (var index = 0; index < size; index++) {
 
       var dataObj = this._dataList.getObjectAt(index);
-      
+
       for (var columnIndex = 0; columnIndex < this._columnMeta.length; columnIndex++) {
         var col = this._columnMeta[columnIndex];
         let value = dataObj[col.attribute];
-        if ( undefined === value ) {
+        if (undefined === value) {
           continue;
         }
 
-        if ( _.isObject( value ) ) {
+        if (_.isObject(value)) {
           value = value.toString();
         }
-      
+
         if (_.isNumber(value)) {
           value = value.toString();
         }
-       
+
         if (value.toLowerCase().indexOf(filterBy) !== -1) {
           filteredData.push(dataObj);
           break;
@@ -415,8 +416,8 @@ class SuperTable extends React.Component {
 
     let columnWidths = {};
     this._columnMeta.map((colObj, index) => {
-      if ( undefined === colObj.attribute ) {
-        console.log( 'No attribute.. must be special column... use header as attribute name' );
+      if (undefined === colObj.attribute) {
+        console.log('No attribute.. must be special column... use header as attribute name');
         colObj.attribute = colObj.header;
       }
       columnWidths[colObj.attribute] = colObj.width;
@@ -623,7 +624,7 @@ class SuperTable extends React.Component {
   }
 
   _pageForward() {
-//alert( (this._currentRow + this.state.rowsPerPage ) + ' ' + this.state.sortedDataList.getSize() );
+    //alert( (this._currentRow + this.state.rowsPerPage ) + ' ' + this.state.sortedDataList.getSize() );
     if (this._currentRow + this.state.rowsPerPage >= this.state.sortedDataList.getSize()) {
       return;
     }
@@ -692,11 +693,20 @@ class SuperTable extends React.Component {
 
   }
 
+  exCB( x ) {
+    console.log( 'STCALLBACK....' );
+    console.log( this );
+    console.log( x );
+  }
   /**
    * REACT Render method.
    */
   render() {
-
+    const pageinatorProps = {...this.props, superTableInstance: this};
+    console.log( pageinatorProps );
+    console.log( 'after pprops');
+    const paginator = new this.props.paginator(pageinatorProps).render();
+    
 
     if (this.state.dataAttrNames.length === 0) {
       console.error('cannot render. attrnames length: ' + this.state.dataAttrNames.length + ' Width: ' + this.state.tableWidth);
@@ -722,7 +732,7 @@ class SuperTable extends React.Component {
 
     return (
       <div style={{ width: '100%' }} ref='superTable'  >
-
+      
         <div style={{ width: this.state.tableWidth }}>
 
           <div style={filterState}>
@@ -806,7 +816,7 @@ class SuperTable extends React.Component {
               </div>
 
               <div style={{ width: '33.3%', float: 'left', textAlign: 'center', lineHeight: '32px' }}>
-                Page {Math.ceil(this._currentRow / this.state.rowsPerPage) + 1 }
+                Page {Math.ceil(this._currentRow / this.state.rowsPerPage) + 1}
                 &nbsp;of&nbsp;
               {Math.ceil(this.state.sortedDataList.getSize() / this.state.rowsPerPage)}
               </div>
@@ -847,7 +857,15 @@ class SuperTable extends React.Component {
 
               </div>
             </div>
+           
           </div>
+
+           <div style={paginationShow}>
+             {paginator}
+             
+            </div>
+
+
         </div>
       </div>
     );

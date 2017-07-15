@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import SuperTable from './lib/SuperTable.jsx';
+import SuperTablePaginator from './lib/SuperTablePaginator.jsx';
 import Button from 'react-bootstrap/lib/Button';
 
 let faker = require('faker');
@@ -111,7 +112,9 @@ function customRender( rowIndex, data, columnKey ) {
  
 }
 
-
+function getPaginator() {
+    return <SuperTablePaginator />
+}
 
 ReactDOM.render(
     <div>
@@ -132,7 +135,10 @@ ReactDOM.render(
             tableHeight={500}
             tableWidth={'100%'}
             totalRowCountText='items found'
+            paginator={SuperTablePaginator}
         />
+       
+        
         <Button onClick={refreshData}>New Data!</Button>
     </div>,
     document.getElementById('app')
