@@ -10,6 +10,11 @@ Custom styles
 
 ### Running the application
 
+To test
+```
+np run start
+```
+Then go to http://localhost:9080
   
 ### Running tests
  
