@@ -1,7 +1,7 @@
 var path = require('path');
 
 var config = {
-    entry: './app.jsx',
+    entry: './app/app.jsx',
 
 
     output: {
