@@ -68,7 +68,6 @@ Let's assume we only want to show id, firstName, lastName, and, city in the tabl
 
 ```
 function getColumnMetaData() {
-
     return [
         { 'header': 'ID', 'width': '10%', attribute: 'id' },
         { 'header': 'First name', 'width': '20%', attribute: 'firstName' },
@@ -76,7 +75,6 @@ function getColumnMetaData() {
         { 'header': 'City', 'width': '20%', attribute: 'city'}
 
     ]
-
 }
 
 ```
@@ -133,7 +131,6 @@ Each attribute that you choose to show form your dataset is defined as part of t
 
 ```
 function getColumnMetaData() {
-
     return [
         { 'header': 'Special', 'width': '10%', renderer: insertCheckbox, order: 1 },
         { 'header': 'ID', 'width': '10%', attribute: 'id', order: 2 },
@@ -142,7 +139,6 @@ function getColumnMetaData() {
         { 'header': 'Street', 'width': '20%', attribute: 'street', order: 5 },
         { 'header': 'Zip', 'width': '20%', attribute: 'zipCode', order: 6 }
     ]
-
 }
 
 ```
@@ -153,17 +149,14 @@ Notes:
 * To 'insert' a column -- as shown in the first attribute -- do not supply an attribute.  But, you must provide a custom rendereder.
 
 ## Custom Renderers
-Each attribute is simply displayed as text.  However, chances are that you want to show your data in a different format.  Cosndier timestamps.  
-You probably would not show a raw timestamp to a user, but would format it .  This is what a customer renderer allows you to do. Here's how you would do that for a timestamp -- along with inserting a checkbox in the first column.  Condider this metadata:
+Each attribute is simply displayed as text.  However, chances are that you want to show your data in a different format.  Consider timestamps. You probably would not show a raw timestamp to a user, but would format it .  This is what a customer renderer allows you to do. Here's how you would do that for a timestamp -- along with inserting a checkbox in the first column.  Condider this metadata:
 
 ```
 function getColumnMetaData() {
-
     return [
         { 'header': 'Special', 'width': '10%', renderer: insertCheckbox },
         { 'header': 'Timestamp', 'width': '20%', attribute: 'timestamp', renderer: dateRenderer  }
     ]
-
 }
 
 ```

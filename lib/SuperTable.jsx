@@ -211,10 +211,18 @@ class SuperTable extends React.Component {
     this._init(data);
     this._setWidths();
     this._processTableProperties();
-    this.setState({
-      sortedDataList: this._dataList
-    });
-
+    if (undefined !== this._filterBy) {
+      if (this._filterBy.length > 0) {
+        let newDataList = this._doFilter(this._filterBy);
+        this.setState({
+          sortedDataList: newDataList
+        });
+      }
+    } else {
+      this.setState({
+        sortedDataList: this._dataList
+      });
+    }
   }
 
 
@@ -289,6 +297,8 @@ class SuperTable extends React.Component {
   * @return filtered list (array)
   */
   _doFilter(filterBy) {
+
+    this._filterBy = filterBy;  // save last filter.
 
     var size = this._dataList.getSize();
     var filteredData = [];
@@ -693,20 +703,20 @@ class SuperTable extends React.Component {
 
   }
 
-  exCB( x ) {
-    console.log( 'STCALLBACK....' );
-    console.log( this );
-    console.log( x );
+  exCB(x) {
+    console.log('STCALLBACK....');
+    console.log(this);
+    console.log(x);
   }
   /**
    * REACT Render method.
    */
   render() {
-    const pageinatorProps = {...this.props, superTableInstance: this};
-    console.log( pageinatorProps );
-    console.log( 'after pprops');
+    const pageinatorProps = { ...this.props, superTableInstance: this };
+    console.log(pageinatorProps);
+    console.log('after pprops');
     const paginator = new this.props.paginator(pageinatorProps).render();
-    
+
 
     if (this.state.dataAttrNames.length === 0) {
       console.error('cannot render. attrnames length: ' + this.state.dataAttrNames.length + ' Width: ' + this.state.tableWidth);
@@ -718,7 +728,7 @@ class SuperTable extends React.Component {
     let paginationShow = { display: 'block' };
     let showTotalRowCountDisplay = this.props.showTotalRowCount ? 'block' : 'none'
 
-    alert( showTotalRowCountDisplay );
+    alert(showTotalRowCountDisplay);
 
     if (this.props.showFilter !== undefined && !this.props.showFilter) {
       filterState = { display: 'none' }
@@ -735,7 +745,7 @@ class SuperTable extends React.Component {
 
     return (
       <div style={{ width: '100%' }} ref='superTable'  >
-      
+
         <div style={{ width: this.state.tableWidth }}>
 
           <div style={filterState}>
@@ -795,10 +805,10 @@ class SuperTable extends React.Component {
             })}
           </Table>
 
-          
-           <div style={paginationShow}>
-             {paginator}
-            </div>
+
+          <div style={paginationShow}>
+            {paginator}
+          </div>
 
 
         </div>
