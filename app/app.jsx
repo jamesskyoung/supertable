@@ -8,7 +8,7 @@ import Button from 'react-bootstrap/lib/Button';
 let faker = require('faker');
 
 let data = [];
-let dataSize = 960;
+let dataSize = 3;
 let xswitch = true;
 
 
@@ -16,6 +16,8 @@ let xswitch = true;
 for (var i = 0; i < dataSize; i++) {
     data.push( createFakeRowObjectData( i ) );
 }
+
+console.log( JSON.stringify( data ) );
 
 function createFakeRowObjectData(/*number*/ index) /*object*/ {
     return {
@@ -57,6 +59,19 @@ function getColumnMetaData() {
         { 'header': 'City', 'width': '20%', attribute: 'city', order: 3, resize: true, xrenderer: customRender },
         { 'header': 'Street', 'width': '20%', attribute: 'street', order: 4, maxWidth: 222 },
         { 'header': 'Zip', 'width': '20%', attribute: 'zipCode', order: 5 }
+    ]
+
+}
+
+
+function getColumnMetaData2() {
+
+    return [
+        { 'header': 'ID', 'width': '10%', attribute: 'id' },
+        { 'header': 'First name', 'width': '30%', attribute: 'firstName' },
+        { 'header': 'Last name', 'width': '30%', attribute: 'lastName' },
+        { 'header': 'City', 'width': '30%', attribute: 'city'}
+
     ]
 
 }
@@ -133,6 +148,21 @@ ReactDOM.render(
             showPagination={true}
             showText={'Show'}
             showTotalRowCount={true}
+            tableHeight={500}
+            tableWidth={'100%'}
+            totalRowCountText='items found'
+            paginator={PaginatorExample}
+        />
+
+        <SuperTable 
+            
+            columnMeta={ getColumnMetaData2() }
+            data={data}
+            showFilter={false}
+            rowsPerPage={10}
+            showItemsPerPage={true}
+            showPagination={false}
+            showTotalRowCount={false}
             tableHeight={500}
             tableWidth={'100%'}
             totalRowCountText='items found'

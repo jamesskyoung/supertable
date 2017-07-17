@@ -716,6 +716,9 @@ class SuperTable extends React.Component {
     var { sortedDataList, colSortDirs } = this.state;
     let filterState = { display: 'block', clear: 'both', float: 'left', width: '50%' };
     let paginationShow = { display: 'block' };
+    let showTotalRowCountDisplay = this.props.showTotalRowCount ? 'block' : 'none'
+
+    alert( showTotalRowCountDisplay );
 
     if (this.props.showFilter !== undefined && !this.props.showFilter) {
       filterState = { display: 'none' }
@@ -746,7 +749,7 @@ class SuperTable extends React.Component {
             </div>
             <br />
           </div>
-          <div style={{ float: 'right', fontWeight: 'bold', lineHeight: '50px' }}>
+          <div style={{ display: showTotalRowCountDisplay, float: 'right', fontWeight: 'bold', lineHeight: '50px' }}>
             {sortedDataList.getSize()} {this.props.totalRowCountText}
           </div>
         </div>
@@ -792,77 +795,9 @@ class SuperTable extends React.Component {
             })}
           </Table>
 
-          <div style={paginationShow}>
-            <div style={{ clear: 'both', float: 'left', width: this.state.tableWidth }}>
-              <div style={{ width: '33.3%', float: 'left' }}>{this.props.showText}
-                &nbsp;
-
-                <DropdownButton id='rowsPerPage' title={this.state.rowsPerPage} className='btn btn-default'>
-                  {rowsPerPage.map((number, index) => (
-
-                    <MenuItem key={index} id={number} href='#'
-                      onClick={(event) => {
-                        this._onChangeRowsPerPage(number)
-                      }
-
-                      }>
-                      {number}
-                    </MenuItem>
-                  ))}
-                </DropdownButton>
-
-                &nbsp;
-              {this.props.itemsPerPageText}
-              </div>
-
-              <div style={{ width: '33.3%', float: 'left', textAlign: 'center', lineHeight: '32px' }}>
-                Page {Math.ceil(this._currentRow / this.state.rowsPerPage) + 1}
-                &nbsp;of&nbsp;
-              {Math.ceil(this.state.sortedDataList.getSize() / this.state.rowsPerPage)}
-              </div>
-
-              <div style={{ width: '33.3%', float: 'left', textAlign: 'right', lineHeight: '32px' }}>
-                <i title='First page' style={{ cursor: 'pointer' }} className='fa fa-chevron-left'
-                  onClick={((event) => {
-                    this._pageFirst();
-                  })}>
-                </i>
-                <i title='First page' style={{ cursor: 'pointer' }} className='fa fa-chevron-left'
-                  onClick={((event) => {
-                    this._pageFirst();
-                  })}>
-                </i>
-                &nbsp;&nbsp;
-              <i title='Previous page' style={{ cursor: 'pointer', padding: '4px' }} className='fa fa-chevron-left' onClick={((event) => {
-                  this._pageBackward();
-                })}>
-                </i>
-                &nbsp;
-              <i title='Next page' style={{ cursor: 'pointer' }} className='fa fa-chevron-right'
-                  onClick={((event) => {
-                    this._pageForward();
-                  })}>
-                </i>
-                &nbsp;&nbsp;
-              <i title='Last page' style={{ cursor: 'pointer' }} className='fa fa-chevron-right'
-                  onClick={((event) => {
-                    this._pageLast();
-                  })}>
-                </i>
-                <i title='Last page' style={{ cursor: 'pointer' }} className='fa fa-chevron-right'
-                  onClick={((event) => {
-                    this._pageLast();
-                  })}>
-                </i>
-
-              </div>
-            </div>
-           
-          </div>
-
+          
            <div style={paginationShow}>
              {paginator}
-             
             </div>
 
 
