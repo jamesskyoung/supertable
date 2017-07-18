@@ -103,6 +103,9 @@ And our table Component (with paging) would look like this:
 />
 
 ```
+### Important
+
+Although only the attributes thare defined within the column metadata object are shown, the object that is passed back on a cell click or row click event is the entire row.  This makes it easy to get data that is not visible 'on screen'. 
 
 ## Properties
 
@@ -127,7 +130,7 @@ pagination | The paginator component.  Only needed if you have written your own 
 
 
 ## Column Meta Data
-Each attribute that you choose to show form your dataset is defined as part of the Column Metadata object. Here's an example:
+Each attribute that you choose to show from your dataset is defined as part of the Column Metadata object. Here's an example:
 
 ```
 function getColumnMetaData() {
@@ -165,7 +168,7 @@ function getColumnMetaData() {
 Is simply a function that will be called with the following parmameters:
 
 * rowindex --> The index of the current row
-* data --> An array that represents the current row.  To get the raw data for this attribute, use data[columnName]
+* data --> An object that represents the current row.  To get the raw data for this attribute, use data[columnName]
 * columnName --> The column name.  In this case, 'Special'
 
 ```
@@ -186,7 +189,7 @@ dateRenderer(rowIndex, data, columnKey) {
 ```
 
 ## Event Handling
-The table can cal lback on cell click events, and row click events.  The row clicked event passes an object that represetns the current row.  To retrieve a single attribute from this row, simply use data[column]. For example:
+The table can call back on cell click events, and row click events.  Both events receive the row object.  This row object contains the entire row, not just the atrtibutes that are displayed. To retrieve a single attribute from this row, simply use row[column]. For example:
 
 ```
 <SuperTable 
@@ -197,7 +200,7 @@ The table can cal lback on cell click events, and row click events.  The row cli
 />            
 
 // Show the attribute name and its value for this cell
-function cellClick(rowIndex, column, data) {
+function cellClick(rowIndex, column, row) {
     alert('Cell clicked! attribute name : ' + column + ' Id is: ' + data[column]);
 }
 
