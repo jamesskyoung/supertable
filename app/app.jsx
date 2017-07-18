@@ -135,41 +135,24 @@ function getPaginator() {
 ReactDOM.render(
     <div>
         <h1>React SuperTable</h1>
+
         <SuperTable 
             ref={instance => { window.superTable = instance; }}
-            columnMeta={ getColumnMetaData() }
+            columnMeta={ getColumnMetaData2() }
             data={data}
-            filterPlaceholder='Filter...'
-            itemsPerPageText='items per page'
-            onCellClickCallback={cellClick}
-            onRowClickCallback={rowClick}
+            itemsPerPageText= 'rows per page'
+            showFilter={false}
+            showText='Show: '
             rowsPerPage={10}
-            showItemsPerPage={true}
+            showItemsPerPage={false}
             showPagination={true}
-            showText={'Show'}
             showTotalRowCount={true}
             tableHeight={500}
             tableWidth={'100%'}
             totalRowCountText='items found'
-            paginator={PaginatorExample}
+            xpaginator={PaginatorExample}
         />
-
-        <SuperTable 
-            
-            columnMeta={ getColumnMetaData2() }
-            data={data}
-            showFilter={false}
-            rowsPerPage={10}
-            showItemsPerPage={true}
-            showPagination={false}
-            showTotalRowCount={false}
-            tableHeight={500}
-            tableWidth={'100%'}
-            totalRowCountText='items found'
-            paginator={PaginatorExample}
-        />
-       
-        
+ 
         <Button onClick={refreshData}>New Data!</Button>
     </div>,
     document.getElementById('app')

@@ -118,9 +118,10 @@ itemsPerPageText | The text that will be used when oagination is active for 'ite
 onCellClickCallback | A function that will be invoked when a **cell** is clicked |
 onRowClickCallback | A function that will be invoked when a **row** is clicked |
 rowsPerPage | How many rows will be displayed per page (affects pagination if active) |
-showItemsperPage | True or False. Show the items per page text? |
+showItemsPerPage | True or False. Show items per page? |
+showItemsPerPageText | The items per page text.  Ex: rows per page. (See showText) |
 showPagination | True, False. Show the pagination component?  If false, then the entire dataset is shown. |
-showText | Text to use for 'show' |
+showText | Text to use for 'show'.  i.e. Show nnn rows per page.  (See showItemsPerPageText) |
 showTotalRowCount | True, False. Show how many items are in the dataset? (Applies to a filter as well.) |
 tableHeight | Height in pixels of the table |
 tableWidth | Pixels or Percent.  i.e. 1000px or 76% |

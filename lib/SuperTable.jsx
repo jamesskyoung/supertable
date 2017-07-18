@@ -713,8 +713,12 @@ class SuperTable extends React.Component {
     const pageinatorProps = { ...this.props, superTableInstance: this };
     console.log(pageinatorProps);
     console.log('after pprops');
-    const paginator = new this.props.paginator(pageinatorProps).render();
-
+    let paginator;
+    if ( undefined === this.props.paginator ) {
+      paginator = new SuperTablePaginator(pageinatorProps).render();
+    } else {
+      paginator = new this.props.paginator(pageinatorProps).render();
+    }
 
     if (this.state.dataAttrNames.length === 0) {
       console.error('cannot render. attrnames length: ' + this.state.dataAttrNames.length + ' Width: ' + this.state.tableWidth);
