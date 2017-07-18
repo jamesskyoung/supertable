@@ -1,6 +1,6 @@
 {
   "name": "reactsupertable",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Flexible REACT data table based on Facebook's fixed-data-table",
   "keywords": [
     "react",
