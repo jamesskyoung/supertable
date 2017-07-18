@@ -81,8 +81,8 @@ function rowClick(row) {
 }
 
 
-function cellClick(rowIndex, column, data) {
-    alert('Cell clicked! attribute name : ' + column + ' Id is: ' + data['id']);
+function cellClick(rowIndex, column, cell ) {
+    alert('Cell clicked! attribute name : ' + column + ' Id is: ' + cell );
 }
 
 function customRender(rowIndex, data, columnKey) {

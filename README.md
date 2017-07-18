@@ -105,7 +105,7 @@ And our table Component (with paging) would look like this:
 ```
 ### Important
 
-Although only the attributes thare defined within the column metadata object are shown, the object that is passed back on a cell click or row click event is the entire row.  This makes it easy to get data that is not visible 'on screen'. 
+Although only the attributes thare defined within the column metadata object are shown, the object that is passed back on a cell click or row click event is the entire row.  This makes it easy to get data that is not visible 'on screen'. A good use of this is say, and 'id' field that the user doesn't need to know about...but it needed for subsequent operaitons etc.
 
 ## Properties
 
@@ -151,7 +151,7 @@ Notes:
 * Resize allows the user to resize the column width -- but this is not persisted.  A later release will provide an option to persist.
 * To 'insert' a column -- as shown in the first attribute -- do not supply an attribute.  But, you must provide a custom rendereder.
 
-## Custom Renderers
+## Custom Renderers and Inserting New Attributes
 Each attribute is simply displayed as text.  However, chances are that you want to show your data in a different format.  Consider timestamps. You probably would not show a raw timestamp to a user, but would format it .  This is what a customer renderer allows you to do. Here's how you would do that for a timestamp -- along with inserting a checkbox in the first column.  Condider this metadata:
 
 ```
@@ -189,7 +189,9 @@ dateRenderer(rowIndex, data, columnKey) {
 ```
 
 ## Event Handling
-The table can call back on cell click events, and row click events.  Both events receive the row object.  This row object contains the entire row, not just the atrtibutes that are displayed. To retrieve a single attribute from this row, simply use row[column]. For example:
+The table can call back on cell click events, and row click events.  The row click event receives a row object and the cell click event receives the raw data for this cell.  
+
+This row object contains the entire row, not just the attributes that are displayed. To retrieve a single attribute from this row, simply use row.*attribute* for a row click. For example:
 
 ```
 <SuperTable 
@@ -200,8 +202,8 @@ The table can call back on cell click events, and row click events.  Both events
 />            
 
 // Show the attribute name and its value for this cell
-function cellClick(rowIndex, column, row) {
-    alert('Cell clicked! attribute name : ' + column + ' Id is: ' + data[column]);
+function cellClick(rowIndex, column, cell) {
+    alert('Cell clicked! attribute name : ' + column + ' Cell is: ' + cell );
 }
 
 // Show the id attribute for this row
@@ -236,16 +238,8 @@ function refreshData( data ) {
 
 Here, refreshData is called with what is the updated dataset.  SuperTable's refresh method is invoked and the table repaints.
 
-### Running the application
 
-To test
-```
-np run start
-```
-Then go to http://localhost:9080
-  
-### Running tests
- 
+This does it for version 1.0
 
-### Coverage Reporting
+Thanks...Much more to come
    

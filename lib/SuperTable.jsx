@@ -482,7 +482,7 @@ class SuperTable extends React.Component {
       return;
     }
 
-    this.props.onCellClickCallback(index, column, data)
+    this.props.onCellClickCallback(index, column, data[column])
   }
 
   /**
@@ -725,8 +725,6 @@ class SuperTable extends React.Component {
     let filterState = { display: 'block', clear: 'both', float: 'left', width: '50%' };
     let paginationShow = { display: 'block' };
     let showTotalRowCountDisplay = this.props.showTotalRowCount ? 'block' : 'none'
-
-    alert(showTotalRowCountDisplay);
 
     if (this.props.showFilter !== undefined && !this.props.showFilter) {
       filterState = { display: 'none' }
