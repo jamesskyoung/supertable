@@ -561,12 +561,15 @@ class SuperTable extends React.Component {
    * @param {*} event 
    * @param {*} index 
    */
-  _onRowClick(event, index) {
+   _onRowClick(event, index) {
+
     if (undefined === this.props.onRowClickCallback) {
       return;
     }
 
-    let row = this.state.sortedDataList.getObjectAt(index);
+    let pageNumber = Math.ceil(this._currentRow / this.state.rowsPerPage);
+    let trueIndex = (index + ( pageNumber * this.state.rowsPerPage ));
+    let row = this.state.sortedDataList.getObjectAt( trueIndex );
     this.props.onRowClickCallback(row);
   }
 
@@ -644,13 +647,8 @@ class SuperTable extends React.Component {
   }
 
   _pageLast() {
-    this._currentRow = (this.state.sortedDataList.getSize() - this.state.rowsPerPage)
-    if (this._currentRow < 0) {
-      this._currentRow = 0;
-    }
-
-    // Just force redisplay.  Start row will simply be incremented...
-    this.setState({ redisplay: true });
+    this._currentRow = ( Math.floor( this.state.sortedDataList.getSize() / this.state.rowsPerPage ) - 1 ) * this.state.rowsPerPage;
+    this._pageForward();
   }
 
   /**
