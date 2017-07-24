@@ -6,7 +6,6 @@
  * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
- * (c) SIE, 2017
  * 
  */
 
@@ -21,6 +20,7 @@ import SuperTableStore from './SuperTableStore';
 import SuperTablePaginator from './SuperTablePaginator.jsx';
 
 //require('./fixed-data-table.css');
+var rowClickedIndex = null;
 
 const { Table, Column, Cell } = FixedDataTable;
 
@@ -169,7 +169,7 @@ class SuperTable extends React.Component {
     }
 
     // Get rows per page from local storage... if null, use props
-    let rowsPerPage = localStorage.getItem("pmdb_rowsPerPage");
+    let rowsPerPage = localStorage.getItem("supertable_rowsPerPage");
 
     if (rowsPerPage == null) {
       rowsPerPage = this.props.rowsPerPage === undefined ? 0 : this.props.rowsPerPage;
@@ -492,7 +492,7 @@ class SuperTable extends React.Component {
    */
   _onChangeRowsPerPage(rowsPerPage) {
 
-    localStorage.setItem("pmdb_rowsPerPage", parseInt(rowsPerPage));
+    localStorage.setItem("supertable_rowsPerPage", parseInt(rowsPerPage));
 
     // Just force redisplay.  Decrement start row by 2 * rowsperPage
     let rowsToReturn = this.state.rowsPerPage;
@@ -561,15 +561,18 @@ class SuperTable extends React.Component {
    * @param {*} event 
    * @param {*} index 
    */
-   _onRowClick(event, index) {
-
+  _onRowClick(event, index) {
+    console.log(event);
+    rowClickedIndex = index;
+    alert(rowClickedIndex)
     if (undefined === this.props.onRowClickCallback) {
+      this.setState({ refresh: true });
       return;
     }
 
     let pageNumber = Math.ceil(this._currentRow / this.state.rowsPerPage);
-    let trueIndex = (index + ( pageNumber * this.state.rowsPerPage ));
-    let row = this.state.sortedDataList.getObjectAt( trueIndex );
+    let trueIndex = (index + (pageNumber * this.state.rowsPerPage));
+    let row = this.state.sortedDataList.getObjectAt(trueIndex);
     this.props.onRowClickCallback(row);
   }
 
@@ -647,7 +650,7 @@ class SuperTable extends React.Component {
   }
 
   _pageLast() {
-    this._currentRow = ( Math.floor( this.state.sortedDataList.getSize() / this.state.rowsPerPage ) - 1 ) * this.state.rowsPerPage;
+    this._currentRow = (Math.floor(this.state.sortedDataList.getSize() / this.state.rowsPerPage) - 1) * this.state.rowsPerPage;
     this._pageForward();
   }
 
@@ -701,11 +704,17 @@ class SuperTable extends React.Component {
 
   }
 
-  exCB(x) {
-    console.log('STCALLBACK....');
-    console.log(this);
-    console.log(x);
+  rowClassNameGetter(index) {
+    console.log('rowclassnamegetter: ' + index + '' + rowClickedIndex );
+
+    if (index === rowClickedIndex) {
+      return 'public_fixedDataTableRow_highlighted_clicked public_fixedDataTableCell_main';
+    } else {
+      return '';
+    }
+
   }
+
   /**
    * REACT Render method.
    */
@@ -714,7 +723,7 @@ class SuperTable extends React.Component {
     console.log(pageinatorProps);
     console.log('after pprops');
     let paginator;
-    if ( undefined === this.props.paginator ) {
+    if (undefined === this.props.paginator) {
       paginator = new SuperTablePaginator(pageinatorProps).render();
     } else {
       paginator = new this.props.paginator(pageinatorProps).render();
@@ -768,6 +777,7 @@ class SuperTable extends React.Component {
           <Table
             rowHeight={this.props.rowHeight ? this.props.rowHeight : 50}
             rowsCount={viewList.getSize()}
+            rowClassNameGetter={this.rowClassNameGetter}
             headerHeight={this.props.headerHeight ? this.props.headerHeight : 50}
             width={this.state.tableWidth}
             //height={this.props.tableHeight ? this.props.tableHeight : 500}

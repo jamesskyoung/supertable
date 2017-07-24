@@ -134,7 +134,7 @@ function getPaginator() {
 
 ReactDOM.render(
     <div>
-        <h1>React SuperTable</h1>
+        <h1>Test table</h1>
 
         <SuperTable 
             ref={instance => { window.superTable = instance; }}

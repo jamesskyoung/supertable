@@ -105,7 +105,7 @@ And our table Component (with paging) would look like this:
 ```
 ### Important
 
-Although only the attributes thare defined within the column metadata object are shown, the object that is passed back on a cell click or row click event is the entire row.  This makes it easy to get data that is not visible 'on screen'. A good use of this is say, and 'id' field that the user doesn't need to know about...but it needed for subsequent operaitons etc.
+Although only the attributes thare defined within the column metadata object are shown, the object that is passed back on a cell click or row click event is the entire row.  This makes it easy to get data that is not visible 'on screen'. A good use of this is say, an 'id' field that the user doesn't need to know about...but is needed for subsequent operaitons etc.
 
 ## Properties
 
@@ -169,7 +169,7 @@ function getColumnMetaData() {
 Is simply a function that will be called with the following parmameters:
 
 * rowindex --> The index of the current row
-* data --> An object that represents the current row.  To get the raw data for this attribute, use data[columnName]
+* data --> An object that represents the current row.  To get the raw data for this attribute, use data[columnName] Not used when inserting a column.
 * columnName --> The column name.  In this case, 'Special'
 
 ```

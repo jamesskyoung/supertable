@@ -369,8 +369,7 @@ body[dir="rtl"] .fixedDataTableColumnResizerLineLayout_main {
 .public_fixedDataTable_header,
 .public_fixedDataTable_header .public_fixedDataTableCell_main {
   background-color: #eee;
-/* pmdb  background-color: #f6f7f8; */
- /*pmdb background-image: linear-gradient(#fff, #efefef);*/
+
 }
 
 .public_fixedDataTable_footer .public_fixedDataTableCell_main {
@@ -401,7 +400,7 @@ body[dir="rtl"] .fixedDataTableColumnResizerLineLayout_main {
  */
 
 /**
- * Table cell.
+ * Table cell. main
  */
 .public_fixedDataTableCell_main {
   background-color: #fff;
@@ -452,13 +451,28 @@ body[dir="rtl"] .fixedDataTableColumnResizerLineLayout_main {
  * Table row.
  */
 .public_fixedDataTableRow_main {
-  /* pmdb background-color: #fff; */
   background-color: #eee;
 }
 
+/*
+ * Highlight for striping
+ */
 .public_fixedDataTableRow_highlighted,
 .public_fixedDataTableRow_highlighted .public_fixedDataTableCell_main {
   background-color: #f6f7f8;
+  
+}
+
+
+/*
+ * Highlight for striping
+ */
+.public_fixedDataTableRow_highlighted_clicked {
+  font-weight: bold;
+  font-size: 1.5em;
+  color: red;
+  border-color: red !important;
+  
 }
 
 .public_fixedDataTableRow_fixedColumnsDivider {
