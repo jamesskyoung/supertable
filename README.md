@@ -105,7 +105,7 @@ And our table Component (with paging) would look like this:
 ```
 ### Important
 
-Although only the attributes thare defined within the column metadata object are shown, the object that is passed back on a cell click or row click event is the entire row.  This makes it easy to get data that is not visible 'on screen'. A good use of this is say, an 'id' field that the user doesn't need to know about...but is needed for subsequent operaitons etc.
+Although only the attributes that are defined within the column metadata object are shown, the object that is passed back on a cell click or row click event is the entire row.  This makes it easy to get data that is not visible 'on screen'. A good use of this is say, an 'id' field that the user doesn't need to know about...but is needed for subsequent operations etc.
 
 ## Properties
 

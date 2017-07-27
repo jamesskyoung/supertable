@@ -20,7 +20,7 @@ import SuperTableStore from './SuperTableStore';
 import SuperTablePaginator from './SuperTablePaginator.jsx';
 
 //require('./fixed-data-table.css');
-var rowClickedIndex = null;
+
 
 const { Table, Column, Cell } = FixedDataTable;
 
@@ -162,7 +162,7 @@ class SuperTable extends React.Component {
   constructor(props) {
     super(props);
     this._init();
-
+    this._rowClickedIndex = null;
     var size = this._dataList.getSize();
     for (var index = 0; index < size; index++) {
       this._defaultSortIndexes.push(index);
@@ -393,56 +393,7 @@ class SuperTable extends React.Component {
 
   }
 
-  _processTableProperties() {
-    let table = ReactDOM.findDOMNode(this.refs.superTable);
-    if (table === null) {
-      return false;;
-    }
-
-    if (_.isNumber(this.props.tableWidth)) {
-      this.setState({ shouldRender: true, tableWidth: this.props.tableWidth });
-      return true;
-    }
-
-    let tableWidth = parseInt(this.props.tableWidth.replace('%', ''));
-
-    let rect = table.getBoundingClientRect();
-    let tableWidthPixels = rect.width * (tableWidth / 100);
-    if (tableWidthPixels == 0) {
-      return false;
-    }
-
-    let tableInPercentage = false;
-
-    this._columnMeta.map((colObj, index) => {
-
-      if (!_.isNumber(colObj.percentage)) {
-        tableInPercentage = true;
-        let percent = parseInt(colObj.percentage.replace('%', ''));
-        let newWidth = tableWidthPixels * (percent / 100);
-        colObj.width = Math.floor(newWidth);
-      }
-    });
-
-    let columnWidths = {};
-    this._columnMeta.map((colObj, index) => {
-      if (undefined === colObj.attribute) {
-        console.log('No attribute.. must be special column... use header as attribute name');
-        colObj.attribute = colObj.header;
-      }
-      columnWidths[colObj.attribute] = colObj.width;
-
-    });
-
-    if (tableInPercentage) {
-      this.setState({ shouldRender: true, tableWidth: tableWidthPixels, columnWidths: columnWidths });
-    } else {
-      this.setState({ shouldRender: true, columnWidths: columnWidths });
-    }
-    return true;
-  }
-
-
+ 
   /**
    * Compute real table height.
    * 
@@ -558,13 +509,13 @@ class SuperTable extends React.Component {
 
   /**
    * Row has been clicked.. call handler (if present)
+   * 
+   * Save index of row in case css needs to get added
    * @param {*} event 
    * @param {*} index 
    */
   _onRowClick(event, index) {
-    console.log(event);
-    rowClickedIndex = index;
-    alert(rowClickedIndex)
+    this._rowClickedIndex = index;
     if (undefined === this.props.onRowClickCallback) {
       this.setState({ refresh: true });
       return;
@@ -619,7 +570,7 @@ class SuperTable extends React.Component {
   }
 
   _pageBackward() {
-
+    this._rowClickedIndex = null;
     // Just force redisplay.  Decrement start row by 2 * rowsperPage
     let rowsToReturn = this.state.rowsPerPage;
     let currentRow = this._currentRow;
@@ -634,7 +585,7 @@ class SuperTable extends React.Component {
   }
 
   _pageFirst() {
-
+    this._rowClickedIndex = null;
     this._currentRow = 0;
     this.setState({ redisplay: true });
   }
@@ -644,15 +595,78 @@ class SuperTable extends React.Component {
     if (this._currentRow + this.state.rowsPerPage >= this.state.sortedDataList.getSize()) {
       return;
     }
+    this._rowClickedIndex = null;
     // Just force redisplay.  Start row will simply be incremented...
     this._currentRow += this.state.rowsPerPage;
     this.setState({ redisplay: true });
   }
 
   _pageLast() {
+    this._rowClickedIndex = null;
     this._currentRow = (Math.floor(this.state.sortedDataList.getSize() / this.state.rowsPerPage) - 1) * this.state.rowsPerPage;
     this._pageForward();
   }
+
+   _processTableProperties() {
+    let table = ReactDOM.findDOMNode(this.refs.superTable);
+    if (table === null) {
+      return false;;
+    }
+
+    if (_.isNumber(this.props.tableWidth)) {
+      this.setState({ shouldRender: true, tableWidth: this.props.tableWidth });
+      return true;
+    }
+
+    let tableWidth = parseInt(this.props.tableWidth.replace('%', ''));
+
+    let rect = table.getBoundingClientRect();
+    let tableWidthPixels = rect.width * (tableWidth / 100);
+    if (tableWidthPixels == 0) {
+      return false;
+    }
+
+    let tableInPercentage = false;
+
+    this._columnMeta.map((colObj, index) => {
+
+      if (!_.isNumber(colObj.percentage)) {
+        tableInPercentage = true;
+        let percent = parseInt(colObj.percentage.replace('%', ''));
+        let newWidth = tableWidthPixels * (percent / 100);
+        colObj.width = Math.floor(newWidth);
+      }
+    });
+
+    let columnWidths = {};
+    this._columnMeta.map((colObj, index) => {
+      if (undefined === colObj.attribute) {
+        console.log('No attribute.. must be special column... use header as attribute name');
+        colObj.attribute = colObj.header;
+      }
+      columnWidths[colObj.attribute] = colObj.width;
+
+    });
+
+    if (tableInPercentage) {
+      this.setState({ shouldRender: true, tableWidth: tableWidthPixels, columnWidths: columnWidths });
+    } else {
+      this.setState({ shouldRender: true, columnWidths: columnWidths });
+    }
+    return true;
+  }
+
+  _rowClassNameGetter(index) {
+    console.log('rowclassnamegetter: ' + index + '' + this._rowClickedIndex );
+
+    if (index === this._rowClickedIndex) {
+      return 'public_fixedDataTableRow_highlighted_clicked';
+    } else {
+      return '';
+    }
+
+  }
+
 
   /**
     * 
@@ -704,16 +718,6 @@ class SuperTable extends React.Component {
 
   }
 
-  rowClassNameGetter(index) {
-    console.log('rowclassnamegetter: ' + index + '' + rowClickedIndex );
-
-    if (index === rowClickedIndex) {
-      return 'public_fixedDataTableRow_highlighted_clicked public_fixedDataTableCell_main';
-    } else {
-      return '';
-    }
-
-  }
 
   /**
    * REACT Render method.
@@ -777,7 +781,7 @@ class SuperTable extends React.Component {
           <Table
             rowHeight={this.props.rowHeight ? this.props.rowHeight : 50}
             rowsCount={viewList.getSize()}
-            rowClassNameGetter={this.rowClassNameGetter}
+            rowClassNameGetter={this.rowClassNameGetter.bind(this)}
             headerHeight={this.props.headerHeight ? this.props.headerHeight : 50}
             width={this.state.tableWidth}
             //height={this.props.tableHeight ? this.props.tableHeight : 500}

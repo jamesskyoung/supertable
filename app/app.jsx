@@ -8,7 +8,7 @@ import Button from 'react-bootstrap/lib/Button';
 let faker = require('faker');
 
 let data = [];
-let dataSize = 3;
+let dataSize = 308;
 let xswitch = true;
 
 

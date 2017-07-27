@@ -11,7 +11,6 @@ class SuperTablePaginator extends React.Component {
 
   pageBackward() {
     this._stInstance._pageBackward();
-
   }
 
   pageFirst() {
