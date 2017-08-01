@@ -256,7 +256,10 @@ class SuperTable extends React.Component {
    * 
    */
   componentDidMount() {
-
+    window.addEventListener('resize', (() => {
+      this._processTableProperties();
+      this.forceUpdate();
+    }));
     this._processTableProperties();
   }
 
@@ -266,7 +269,6 @@ class SuperTable extends React.Component {
    * an init function etc.
    */
   componentWillMount() {
-    console.log('copmon will mount..');
     console.log(this.props.data);
     // get all attribute names from the data..
     let dataAttrNames = this._getDataAttributes(this.props.data[0]);
@@ -281,6 +283,13 @@ class SuperTable extends React.Component {
       }
     );
 
+  }
+
+  /**
+   * Unregister our listener
+   */
+  componentWillUnmount() {
+    window.removeEventListener('resize', () => this.forceUpdate());
   }
 
   shouldComponentUpdate() {
@@ -393,7 +402,7 @@ class SuperTable extends React.Component {
 
   }
 
- 
+
   /**
    * Compute real table height.
    * 
@@ -607,7 +616,7 @@ class SuperTable extends React.Component {
     this._pageForward();
   }
 
-   _processTableProperties() {
+  _processTableProperties() {
     let table = ReactDOM.findDOMNode(this.refs.superTable);
     if (table === null) {
       return false;;
@@ -657,7 +666,7 @@ class SuperTable extends React.Component {
   }
 
   _rowClassNameGetter(index) {
-    console.log('rowclassnamegetter: ' + index + '' + this._rowClickedIndex );
+    console.log('rowclassnamegetter: ' + index + '' + this._rowClickedIndex);
 
     if (index === this._rowClickedIndex) {
       return 'public_fixedDataTableRow_highlighted_clicked';
