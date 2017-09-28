@@ -330,6 +330,10 @@ class SuperTable extends React.Component {
           value = value.toString();
         }
 
+        if ( value === null ) {
+          continue;
+        }
+        
         if (value.toLowerCase().indexOf(filterBy) !== -1) {
           filteredData.push(dataObj);
           break;
