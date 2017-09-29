@@ -330,10 +330,10 @@ class SuperTable extends React.Component {
           value = value.toString();
         }
 
-        if ( value === null ) {
+        if (value === null) {
           continue;
         }
-        
+
         if (value.toLowerCase().indexOf(filterBy) !== -1) {
           filteredData.push(dataObj);
           break;
@@ -481,7 +481,6 @@ class SuperTable extends React.Component {
     // Just force redisplay.  Decrement start row by 2 * rowsperPage
     let rowsToReturn = this.state.rowsPerPage;
     let currentRow = this._currentRow;
-    //currentRow = currentRow - (2 * rowsToReturn);
     currentRow = currentRow - rowsToReturn - this._rowsOnPage;
     if (currentRow < 0) {
       currentRow = 0;
@@ -489,16 +488,50 @@ class SuperTable extends React.Component {
 
     this._currentRow = currentRow;
 
-    // 
-    this.setState(({ columnWidths }) => ({
-      columnWidths: {
-        ...columnWidths,
-        [columnKey]: newColumnWidth,
+    let width = 0;
+    let remaining = 0;
+
+    // last column always gets extra space if needed....
+    this._columnMeta.map((col, index) => {
+
+      if (col.attribute === columnKey) {
+        width += newColumnWidth;
+      } else {
+        width += this.state.columnWidths[col.attribute];
       }
-    }));
 
+      if (this._columnMeta.length - 1 === index) {
+
+        // last column.  If remaining is > 0, then use this as the column width
+
+        if (remaining > 0) {
+
+          this.setState(({ columnWidths }) => ({
+            columnWidths: {
+              ...columnWidths,
+              [columnKey]: newColumnWidth,
+              [col.attribute]: remaining
+            }
+          }));
+        } else {
+
+          this.setState(({ columnWidths }) => ({
+            columnWidths: {
+              ...columnWidths,
+              [columnKey]: newColumnWidth
+            }
+          }));
+
+        }
+      } else {
+        remaining = (this._tableWidthInPixels - width < 0 ? 0 : this._tableWidthInPixels - width);
+      }
+
+      // need name prop!!!!! --> localStorage.setItem('pmdb_columnWidths', this.state.columnWidths );
+
+    });
   }
-
+  
   /**
     * Filter current dataset.  
     * @see _doFilter
