@@ -6,7 +6,7 @@
  * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
- * 
+ * 2017
  */
 
 "use strict";
@@ -827,7 +827,7 @@ class SuperTable extends React.Component {
           <Table
             rowHeight={this.props.rowHeight ? this.props.rowHeight : 50}
             rowsCount={viewList.getSize()}
-            rowClassNameGetter={this.rowClassNameGetter.bind(this)}
+            rowClassNameGetter={this._rowClassNameGetter.bind(this)}
             headerHeight={this.props.headerHeight ? this.props.headerHeight : 50}
             width={this.state.tableWidth}
             //height={this.props.tableHeight ? this.props.tableHeight : 500}
